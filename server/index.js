@@ -135,6 +135,7 @@ app.get('/api/playdates', async (req, res) => {
 
 app.post('/api/playdates', async (req, res) => {
   try {
+    console.log('PlayDate body:', req.body)
     const date = await createPlayDate(req.body)
     res.json(date)
   } catch (err) {
