@@ -38,7 +38,7 @@ export default function PlayDatesPage() {
   }
 
   const createDate = async () => {
-    if (!title.trim()) return
+    if (!title.trim() || !dateTime) return
     try {
       const res = await fetch(`${API_URL}/api/playdates`, {
         method: 'POST',
@@ -83,6 +83,13 @@ export default function PlayDatesPage() {
             <h3 style={{ marginBottom: '0.25rem' }}>Host a Play Date</h3>
             <p style={{ fontSize: '0.75rem', color: '#6b7a66', marginBottom: '0.75rem' }}>All fields are optional. Keep it gentle.</p>
             <input value={title} onChange={e => setTitle(e.target.value)} placeholder="What are you planning?" style={{ width: '100%', padding: '0.625rem', background: '#0a0f0a', border: '1px solid #2d4a2a', borderRadius: '8px', color: '#e8ede6', marginBottom: '0.5rem' }} />
+            <select value={type} onChange={e => setType(e.target.value)} style={{ width: '100%', padding: '0.625rem', background: '#0a0f0a', border: '1px solid #2d4a2a', borderRadius: '8px', color: '#e8ede6', marginBottom: '0.5rem' }}>
+              <option value="other">🌟 Other</option>
+              <option value="walk">🚶 Walk</option>
+              <option value="coffee">☕ Coffee</option>
+              <option value="game">🎲 Game</option>
+              <option value="skill">🎓 Skill Share</option>
+            </select>
             <input value={location} onChange={e => setLocation(e.target.value)} placeholder="Where?" style={{ width: '100%', padding: '0.625rem', background: '#0a0f0a', border: '1px solid #2d4a2a', borderRadius: '8px', color: '#e8ede6', marginBottom: '0.5rem' }} />
             <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
               <input value={dateTime} onChange={e => setDateTime(e.target.value)} type="datetime-local" style={{ flex: 1, padding: '0.625rem', background: '#0a0f0a', border: '1px solid #2d4a2a', borderRadius: '8px', color: '#e8ede6' }} />
