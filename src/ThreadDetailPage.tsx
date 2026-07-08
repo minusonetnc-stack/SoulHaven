@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom'
+import { useStore } from './store'
 import { useState, useEffect } from 'react'
 import type { Thread } from './types'
 
@@ -18,6 +19,7 @@ const timeAgo = (ts: number | string) => {
 export default function ThreadDetailPage() {
   const { threadId } = useParams<{ threadId: string }>()
   const navigate = useNavigate()
+  const { identity } = useStore()
   const [reply, setReply] = useState('')
   const [thread, setThread] = useState<Thread | null>(null)
   const [loading, setLoading] = useState(true)
@@ -47,8 +49,8 @@ export default function ThreadDetailPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          author: 'Anonymous',
-          authorColor: '#7fb069',
+          author: identity?.soulName || 'Anonymous',
+          authorColor: identity?.soulColor || '#7fb069',
           content: reply,
         })
       })

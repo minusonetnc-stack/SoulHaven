@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useStore } from './store'
 import { useNavigate } from 'react-router-dom'
 import type { Thread } from './types'
 
@@ -19,6 +20,7 @@ const timeAgo = (ts: number | string) => {
 
 export default function ThreadsPage() {
   const navigate = useNavigate()
+  const { identity } = useStore()
   const [activeCategory, setActiveCategory] = useState('All')
   const [showNew, setShowNew] = useState(false)
   const [threads, setThreads] = useState<Thread[]>([])
@@ -55,8 +57,8 @@ export default function ThreadsPage() {
         body: JSON.stringify({
           title: newTitle,
           content: newContent,
-          author: 'Anonymous',
-          authorColor: '#7fb069',
+          author: identity?.soulName || 'Anonymous',
+          authorColor: identity?.soulColor || '#7fb069',
           category: activeCategory === 'All' ? 'General' : activeCategory,
         })
       })
