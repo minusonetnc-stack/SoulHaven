@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useStore } from './store'
 import type { PlayDate } from './types'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
@@ -8,9 +9,16 @@ const TYPE_ICONS: Record<string, string> = { walk: '🚶', coffee: '☕', game: 
 
 export default function PlayDatesPage() {
   const navigate = useNavigate()
+  const { identity } = useStore()
   const [showNew, setShowNew] = useState(false)
   const [dates, setDates] = useState<PlayDate[]>([])
   const [loading, setLoading] = useState(true)
+  const [title, setTitle] = useState('')
+  const [location, setLocation] = useState('')
+  const [dateTime, setDateTime] = useState('')
+  const [maxParticipants, setMaxParticipants] = useState('')
+  const [description, setDescription] = useState('')
+  const [type, setType] = useState('other')
 
   useEffect(() => {
     fetchDates()
@@ -29,6 +37,37 @@ export default function PlayDatesPage() {
     }
   }
 
+  const createDate = async () => {
+    if (!title.trim()) return
+    try {
+      const res = await fetch(`${API_URL}/api/playdates`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          description,
+          type,
+          location,
+          dateTime,
+          maxParticipants: parseInt(maxParticipants) || 10,
+          createdBy: identity?.soulName || 'Anonymous',
+        })
+      })
+      if (res.ok) {
+        setTitle('')
+        setLocation('')
+        setDateTime('')
+        setMaxParticipants('')
+        setDescription('')
+        setType('other')
+        setShowNew(false)
+        fetchDates()
+      }
+    } catch (err) {
+      console.error('Failed to create play date:', err)
+    }
+  }
+
   return (
     <div style={{ minHeight: '100vh', background: '#0a0f0a', color: '#e8ede6', paddingBottom: '80px' }}>
       <div style={{ maxWidth: '800px', margin: '0 auto', padding: '1.5rem' }}>
@@ -43,16 +82,16 @@ export default function PlayDatesPage() {
           <div style={{ background: '#1a2e18', border: '1px solid #2d4a2a', borderRadius: '16px', padding: '1.25rem', marginBottom: '1rem' }}>
             <h3 style={{ marginBottom: '0.25rem' }}>Host a Play Date</h3>
             <p style={{ fontSize: '0.75rem', color: '#6b7a66', marginBottom: '0.75rem' }}>All fields are optional. Keep it gentle.</p>
-            <input placeholder="What are you planning?" style={{ width: '100%', padding: '0.625rem', background: '#0a0f0a', border: '1px solid #2d4a2a', borderRadius: '8px', color: '#e8ede6', marginBottom: '0.5rem' }} />
-            <input placeholder="Where?" style={{ width: '100%', padding: '0.625rem', background: '#0a0f0a', border: '1px solid #2d4a2a', borderRadius: '8px', color: '#e8ede6', marginBottom: '0.5rem' }} />
+            <input value={title} onChange={e => setTitle(e.target.value)} placeholder="What are you planning?" style={{ width: '100%', padding: '0.625rem', background: '#0a0f0a', border: '1px solid #2d4a2a', borderRadius: '8px', color: '#e8ede6', marginBottom: '0.5rem' }} />
+            <input value={location} onChange={e => setLocation(e.target.value)} placeholder="Where?" style={{ width: '100%', padding: '0.625rem', background: '#0a0f0a', border: '1px solid #2d4a2a', borderRadius: '8px', color: '#e8ede6', marginBottom: '0.5rem' }} />
             <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
-              <input type="datetime-local" style={{ flex: 1, padding: '0.625rem', background: '#0a0f0a', border: '1px solid #2d4a2a', borderRadius: '8px', color: '#e8ede6' }} />
-              <input type="number" placeholder="Max people" style={{ width: '100px', padding: '0.625rem', background: '#0a0f0a', border: '1px solid #2d4a2a', borderRadius: '8px', color: '#e8ede6' }} />
+              <input value={dateTime} onChange={e => setDateTime(e.target.value)} type="datetime-local" style={{ flex: 1, padding: '0.625rem', background: '#0a0f0a', border: '1px solid #2d4a2a', borderRadius: '8px', color: '#e8ede6' }} />
+              <input value={maxParticipants} onChange={e => setMaxParticipants(e.target.value)} type="number" placeholder="Max people" style={{ width: '100px', padding: '0.625rem', background: '#0a0f0a', border: '1px solid #2d4a2a', borderRadius: '8px', color: '#e8ede6' }} />
             </div>
-            <textarea placeholder="Describe the vibe..." rows={3} style={{ width: '100%', padding: '0.625rem', background: '#0a0f0a', border: '1px solid #2d4a2a', borderRadius: '8px', color: '#e8ede6', marginBottom: '0.5rem', resize: 'none' }} />
+            <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Describe the vibe..." rows={3} style={{ width: '100%', padding: '0.625rem', background: '#0a0f0a', border: '1px solid #2d4a2a', borderRadius: '8px', color: '#e8ede6', marginBottom: '0.5rem', resize: 'none' }} />
             <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
               <button onClick={() => setShowNew(false)} style={{ padding: '0.5rem 1rem', background: '#1a2e18', color: '#a8b5a3', borderRadius: '8px', border: '1px solid #2d4a2a', cursor: 'pointer' }}>Cancel</button>
-              <button onClick={() => setShowNew(false)} style={{ padding: '0.5rem 1rem', background: '#5a8a52', color: 'white', borderRadius: '8px', border: 'none', cursor: 'pointer' }}>Create</button>
+              <button onClick={createDate} style={{ padding: '0.5rem 1rem', background: '#5a8a52', color: 'white', borderRadius: '8px', border: 'none', cursor: 'pointer' }}>Create</button>
             </div>
           </div>
         )}
