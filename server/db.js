@@ -43,7 +43,7 @@ export async function saveMessage(msg) {
 }
 
 export async function getThreads(category = null) {
-  let query = supabase.from('threads').select('*').order('is_pinned', { ascending: false }).order('created_at', { ascending: false })
+  let query = supabase.from('threads').select('*, replies(*)').order('is_pinned', { ascending: false }).order('created_at', { ascending: false })
   if (category && category !== 'All') {
     query = query.eq('category', category)
   }
