@@ -6,29 +6,28 @@ interface PixelWipeProps {
   onReverseComplete?: () => void
 }
 
-const CHARS = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF'
-const LOGO_TEXT = 'SOULHAVEN'
-const TOR_TEXT = 'TOR'
+const BLOCK = '█'
+const THIN_BLOCK = '▓'
+const FADE_BLOCK = '░'
 
 export default function PixelWipe({ isActive, onComplete, onReverseComplete }: PixelWipeProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [phase, setPhase] = useState<'idle' | 'wiping' | 'revealed' | 'reversing'>('idle')
-  const [showLogo, setShowLogo] = useState(false)
-  const [showNotice, setShowNotice] = useState(false)
+  const [showContent, setShowContent] = useState(false)
   const animationRef = useRef<number>(0)
   const dropsRef = useRef<number[]>([])
   const cutProgressRef = useRef(0)
+  const canvasSizeRef = useRef({ w: 0, h: 0 })
 
   // Track phase changes
   useEffect(() => {
     if (isActive && phase === 'idle') {
       setPhase('wiping')
-      setShowLogo(false)
-      setShowNotice(false)
+      setShowContent(false)
       cutProgressRef.current = 0
     } else if (!isActive && phase === 'revealed') {
       setPhase('reversing')
-      setShowNotice(false)
+      setShowContent(false)
     }
   }, [isActive, phase])
 
@@ -41,69 +40,84 @@ export default function PixelWipe({ isActive, onComplete, onReverseComplete }: P
     if (!ctx) return
 
     const resize = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
-      const columns = Math.floor(canvas.width / 14)
-      dropsRef.current = new Array(columns).fill(1)
+      const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      const w = window.innerWidth
+      const h = window.innerHeight
+      canvas.width = w * dpr
+      canvas.height = h * dpr
+      canvas.style.width = w + 'px'
+      canvas.style.height = h + 'px'
+      ctx.scale(dpr, dpr)
+      canvasSizeRef.current = { w, h }
+      const columns = Math.floor(w / 16)
+      dropsRef.current = new Array(columns).fill(0)
     }
     resize()
     window.addEventListener('resize', resize)
 
-    let frameCount = 0
+    let lastTime = 0
+    const wipeSpeed = 0.004  // Slower reveal
+    const reverseSpeed = 0.008
 
-    const draw = () => {
+    const draw = (time: number) => {
       if (!ctx || !canvas) return
-      frameCount++
+      const elapsed = time - lastTime
+      if (elapsed < 16) {  // Cap at ~60fps
+        animationRef.current = requestAnimationFrame(draw)
+        return
+      }
+      lastTime = time
 
-      // Semi-transparent black for trail effect
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-      ctx.fillStyle = '#0f0'
-      ctx.font = '14px monospace'
-
+      const { w, h } = canvasSizeRef.current
       const drops = dropsRef.current
       const cutProgress = cutProgressRef.current
 
+      // Semi-transparent black for trail effect
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.08)'
+      ctx.fillRect(0, 0, w, h)
+
+      ctx.fillStyle = '#0f0'
+      ctx.font = 'bold 14px monospace'
+
       for (let i = 0; i < drops.length; i++) {
-        const char = CHARS[Math.floor(Math.random() * CHARS.length)]
-        const x = i * 14
-        const y = drops[i] * 14
+        const char = Math.random() > 0.7 ? BLOCK : (Math.random() > 0.5 ? THIN_BLOCK : FADE_BLOCK)
+        const x = i * 16
+        const y = drops[i] * 16
 
-        // "Cut through" effect — in the center area, characters fade to reveal layer
-        const centerX = canvas.width / 2
-        const centerY = canvas.height / 2
-        const distFromCenter = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2))
-        const maxDist = Math.min(canvas.width, canvas.height) * 0.4 * cutProgress
+        // "Cut through" effect — carve a widening oval from center
+        const centerX = w / 2
+        const centerY = h / 2
+        const dx = (x - centerX) / (w * 0.3 * cutProgress + 1)
+        const dy = (y - centerY) / (h * 0.3 * cutProgress + 1)
+        const dist = Math.sqrt(dx * dx + dy * dy)
 
-        if (distFromCenter < maxDist && cutProgress > 0.1) {
-          // Inside the "cut" — fade out or skip
-          ctx.globalAlpha = Math.max(0, (distFromCenter / maxDist) - 0.3)
+        if (dist < 1.0 && cutProgress > 0.05) {
+          // Inside the cut — fade to black (reveals layer underneath)
+          ctx.globalAlpha = Math.max(0, dist - 0.3)
         } else {
-          ctx.globalAlpha = 1
+          ctx.globalAlpha = Math.min(1, 0.3 + cutProgress * 0.7)
         }
 
         ctx.fillText(char, x, y)
         ctx.globalAlpha = 1
 
         // Reset drop to top randomly
-        if (y > canvas.height && Math.random() > 0.975) {
+        if (y > h && Math.random() > 0.985) {
           drops[i] = 0
         }
-        drops[i]++
+        drops[i] += 0.5 + Math.random() * 0.5
       }
 
       // Handle phase transitions
       if (phase === 'wiping') {
-        cutProgressRef.current = Math.min(1, cutProgressRef.current + 0.008)
+        cutProgressRef.current = Math.min(1, cutProgressRef.current + wipeSpeed)
         if (cutProgressRef.current >= 1) {
           setPhase('revealed')
-          setTimeout(() => setShowLogo(true), 200)
-          setTimeout(() => setShowNotice(true), 800)
+          setTimeout(() => setShowContent(true), 300)
           onComplete?.()
         }
       } else if (phase === 'reversing') {
-        cutProgressRef.current = Math.max(0, cutProgressRef.current - 0.015)
+        cutProgressRef.current = Math.max(0, cutProgressRef.current - reverseSpeed)
         if (cutProgressRef.current <= 0) {
           setPhase('idle')
           onReverseComplete?.()
@@ -127,7 +141,7 @@ export default function PixelWipe({ isActive, onComplete, onReverseComplete }: P
     <div style={{
       position: 'fixed',
       inset: 0,
-      zIndex: 9999,
+      zIndex: 9998,
       pointerEvents: phase === 'revealed' ? 'none' : 'auto',
     }}>
       {/* Canvas pixel rain */}
@@ -136,8 +150,9 @@ export default function PixelWipe({ isActive, onComplete, onReverseComplete }: P
         style={{
           position: 'absolute',
           inset: 0,
-          opacity: phase === 'revealed' ? 0.3 : 1,
-          transition: 'opacity 1s ease',
+          opacity: phase === 'revealed' ? 0.15 : 1,
+          transition: 'opacity 2s ease',
+          zIndex: 1,
         }}
       />
 
@@ -150,48 +165,83 @@ export default function PixelWipe({ isActive, onComplete, onReverseComplete }: P
         alignItems: 'center',
         justifyContent: 'center',
         background: '#000',
-        opacity: cutProgressRef.current > 0.5 ? 1 : 0,
-        transition: 'opacity 0.5s ease',
+        opacity: cutProgressRef.current > 0.3 ? 1 : 0,
+        transition: 'opacity 1s ease',
+        zIndex: 0,
+        overflow: 'hidden',
       }}>
-        {/* Logo reveal */}
-        {showLogo && (
+        {/* Fine-line SVG Logo */}
+        {showContent && (
           <div style={{
-            animation: 'logoReveal 1.5s ease-out forwards',
+            animation: 'logoFadeIn 2s ease-out forwards',
             textAlign: 'center',
+            maxWidth: '90vw',
+            padding: '2rem',
           }}>
-            {/* Tor onion style logo */}
-            <div style={{
-              width: '120px',
-              height: '120px',
-              margin: '0 auto 1.5rem',
-              borderRadius: '50%',
-              border: '3px solid #0f0',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '3rem',
-              color: '#0f0',
-              boxShadow: '0 0 40px #0f040, inset 0 0 40px #0f020',
-              animation: 'pulse 2s ease-in-out infinite',
-            }}>
-              🧅
-            </div>
+            {/* SVG: Fine-line onion + SH monogram */}
+            <svg
+              width="120"
+              height="140"
+              viewBox="0 0 120 140"
+              style={{ margin: '0 auto 1.5rem', display: 'block' }}
+            >
+              {/* Onion outline — fine lines */}
+              <g fill="none" stroke="#0f0" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round">
+                {/* Onion body */}
+                <path d="M60 20 C60 20, 30 35, 30 70 C30 105, 45 125, 60 130 C75 125, 90 105, 90 70 C90 35, 60 20, 60 20Z" />
+                {/* Inner layers */}
+                <path d="M60 30 C60 30, 40 42, 40 70 C40 98, 50 115, 60 120 C70 115, 80 98, 80 70 C80 42, 60 30, 60 30Z" opacity="0.6" />
+                <path d="M60 42 C60 42, 48 50, 48 70 C48 90, 54 105, 60 108 C66 105, 72 90, 72 70 C72 50, 60 42, 60 42Z" opacity="0.4" />
+                {/* Stem */}
+                <path d="M58 20 L58 8 L62 8 L62 20" />
+                <path d="M56 12 L64 12" opacity="0.5" />
+                {/* Roots */}
+                <path d="M55 128 Q52 135 50 138" opacity="0.4" />
+                <path d="M60 130 L60 138" opacity="0.4" />
+                <path d="M65 128 Q68 135 70 138" opacity="0.4" />
+              </g>
+
+              {/* SH monogram inside — fine, elegant */}
+              <text
+                x="60"
+                y="85"
+                textAnchor="middle"
+                fill="none"
+                stroke="#0f0"
+                strokeWidth="0.6"
+                fontFamily="Georgia, serif"
+                fontSize="28"
+                fontStyle="italic"
+                opacity="0.9"
+              >
+                SH
+              </text>
+
+              {/* Decorative dots */}
+              <circle cx="60" cy="110" r="1.5" fill="#0f0" opacity="0.6" />
+              <circle cx="45" cy="60" r="1" fill="#0f0" opacity="0.3" />
+              <circle cx="75" cy="60" r="1" fill="#0f0" opacity="0.3" />
+            </svg>
+
             <h1 style={{
               fontFamily: '"Courier New", monospace',
-              fontSize: '1.5rem',
+              fontSize: 'clamp(1rem, 3vw, 1.5rem)',
               color: '#0f0',
-              letterSpacing: '0.3em',
+              letterSpacing: '0.4em',
               textTransform: 'uppercase',
               marginBottom: '0.5rem',
-              textShadow: '0 0 20px #0f0',
+              fontWeight: 300,
+              textShadow: '0 0 15px #0f040',
             }}>
-              {LOGO_TEXT}
+              SOULHAVEN
             </h1>
             <p style={{
               fontFamily: '"Courier New", monospace',
-              fontSize: '0.75rem',
-              color: '#0f0aa',
-              letterSpacing: '0.2em',
+              fontSize: 'clamp(0.625rem, 2vw, 0.875rem)',
+              color: '#0f0',
+              opacity: 0.6,
+              letterSpacing: '0.3em',
+              fontWeight: 300,
             }}>
               SECURE LAYER ACTIVE
             </p>
@@ -199,54 +249,90 @@ export default function PixelWipe({ isActive, onComplete, onReverseComplete }: P
         )}
 
         {/* "You're safe" notice */}
-        {showNotice && (
+        {showContent && (
           <div style={{
             position: 'absolute',
-            bottom: '20%',
-            animation: 'fadeUp 1s ease-out forwards',
+            bottom: '15%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            animation: 'noticeSlideUp 1.5s ease-out 0.5s forwards',
+            opacity: 0,
             textAlign: 'center',
+            width: '90vw',
+            maxWidth: '400px',
           }}>
             <div style={{
-              padding: '1rem 2rem',
+              padding: '1rem 1.5rem',
               border: '1px solid #0f0',
-              borderRadius: '4px',
-              background: 'rgba(0, 255, 0, 0.05)',
+              borderRadius: '2px',
+              background: 'rgba(0, 255, 0, 0.03)',
             }}>
               <p style={{
                 fontFamily: '"Courier New", monospace',
-                fontSize: '1rem',
+                fontSize: 'clamp(0.875rem, 2.5vw, 1.125rem)',
                 color: '#0f0',
                 margin: 0,
-                textShadow: '0 0 10px #0f0',
+                fontWeight: 300,
+                letterSpacing: '0.1em',
+                textShadow: '0 0 10px #0f060',
               }}>
                 ✓ You're safe
               </p>
               <p style={{
                 fontFamily: '"Courier New", monospace',
-                fontSize: '0.625rem',
-                color: '#0f0aa',
+                fontSize: 'clamp(0.5rem, 1.5vw, 0.625rem)',
+                color: '#0f0',
+                opacity: 0.5,
                 marginTop: '0.5rem',
+                letterSpacing: '0.15em',
+                fontWeight: 300,
               }}>
                 End-to-end encrypted • No logs • Anonymous
               </p>
             </div>
           </div>
         )}
+
+        {/* Exit button — click to toggle off */}
+        {showContent && (
+          <button
+            onClick={() => {
+              // We need to toggle back off — but this component doesn't have access to toggleSecure
+              // So we dispatch a custom event that App.tsx listens for
+              window.dispatchEvent(new CustomEvent('toggleSecureMode'))
+            }}
+            style={{
+              position: 'absolute',
+              top: '1.5rem',
+              right: '1.5rem',
+              background: 'transparent',
+              border: '1px solid #0f0',
+              color: '#0f0',
+              padding: '0.5rem 1rem',
+              fontFamily: '"Courier New", monospace',
+              fontSize: '0.75rem',
+              cursor: 'pointer',
+              opacity: 0.6,
+              transition: 'opacity 0.3s',
+              zIndex: 10,
+            }}
+            onMouseEnter={e => e.currentTarget.style.opacity = '1'}
+            onMouseLeave={e => e.currentTarget.style.opacity = '0.6'}
+          >
+            [EXIT]
+          </button>
+        )}
       </div>
 
       {/* Keyframe styles */}
       <style>{`
-        @keyframes logoReveal {
-          0% { opacity: 0; transform: scale(0.8) translateY(20px); }
-          100% { opacity: 1; transform: scale(1) translateY(0); }
+        @keyframes logoFadeIn {
+          0% { opacity: 0; transform: translateY(20px) scale(0.95); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
         }
-        @keyframes fadeUp {
-          0% { opacity: 0; transform: translateY(30px); }
-          100% { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes pulse {
-          0%, 100% { box-shadow: 0 0 40px #0f040, inset 0 0 40px #0f020; }
-          50% { box-shadow: 0 0 60px #0f080, inset 0 0 60px #0f040; }
+        @keyframes noticeSlideUp {
+          0% { opacity: 0; transform: translateX(-50%) translateY(30px); }
+          100% { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
       `}</style>
     </div>

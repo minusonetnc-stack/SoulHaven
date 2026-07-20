@@ -11,9 +11,17 @@ import ThreadDetailPage from './ThreadDetailPage'
 import PlayDatesPage from './PlayDatesPage'
 import ResourcesPage from './ResourcesPage'
 import SettingsPage from './SettingsPage'
+import { useEffect } from 'react'
 
 function AppContent() {
-  const { isSecure, isTransitioning } = useSecureMode()
+  const { isSecure, toggleSecure, isTransitioning } = useSecureMode()
+
+  // Listen for exit button from PixelWipe
+  useEffect(() => {
+    const handleExit = () => toggleSecure()
+    window.addEventListener('toggleSecureMode', handleExit)
+    return () => window.removeEventListener('toggleSecureMode', handleExit)
+  }, [toggleSecure])
 
   return (
     <>
