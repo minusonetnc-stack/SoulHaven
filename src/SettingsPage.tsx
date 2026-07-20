@@ -1,10 +1,12 @@
 import { useNavigate } from 'react-router-dom'
 import { useStore } from './store'
+import { useSecureMode } from './SecureModeContext'
 import { useState } from 'react'
 
 export default function SettingsPage() {
   const navigate = useNavigate()
   const { identity, theme, setTheme, privacyMode, setPrivacyMode, clearAllData } = useStore()
+  const { isSecure, toggleSecure, isTransitioning } = useSecureMode()
   const [showClearConfirm, setShowClearConfirm] = useState(false)
 
   return (
@@ -41,65 +43,113 @@ export default function SettingsPage() {
         <div style={{ marginBottom: '1.5rem' }}>
           <h2 style={{ fontSize: '0.75rem', color: '#6b7a66', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>Privacy</h2>
           <div style={{ background: '#1a2e18', border: '1px solid #2d4a2a', borderRadius: '16px', padding: '1.25rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
-              <span style={{ fontSize: '1.25rem' }}>🛡️</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
               <div>
-                <span style={{ fontSize: '0.875rem', display: 'block' }}>Privacy Mode</span>
-                <span style={{ fontSize: '0.75rem', color: '#6b7a66' }}>How much data to keep locally</span>
+                <span style={{ fontSize: '0.875rem' }}>🔒 Privacy Mode</span>
+                <p style={{ fontSize: '0.625rem', color: '#6b7a66', marginTop: '0.25rem' }}>How much you want to hide</p>
               </div>
             </div>
-            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {(['standard', 'enhanced', 'maximum'] as const).map(mode => (
                 <button
                   key={mode}
                   onClick={() => setPrivacyMode(mode)}
-                  style={{ flex: 1, padding: '0.5rem', borderRadius: '8px', fontSize: '0.75rem', textTransform: 'capitalize', border: 'none', cursor: 'pointer', background: privacyMode === mode ? '#5a8a52' : '#0a0f0a', color: privacyMode === mode ? 'white' : '#6b7a66' }}
+                  style={{
+                    padding: '0.75rem',
+                    borderRadius: '8px',
+                    border: '1px solid',
+                    borderColor: privacyMode === mode ? '#5a8a52' : '#2d4a2a',
+                    background: privacyMode === mode ? '#5a8a5220' : '#0a0f0a',
+                    color: privacyMode === mode ? '#7fb069' : '#a8b5a3',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
                 >
-                  {mode}
+                  <span style={{ fontSize: '0.875rem', fontWeight: 600, textTransform: 'capitalize' }}>{mode}</span>
+                  <p style={{ fontSize: '0.625rem', color: '#6b7a66', marginTop: '0.25rem' }}>
+                    {mode === 'standard' && 'Basic protections'}
+                    {mode === 'enhanced' && 'No tracking, minimal logs'}
+                    {mode === 'maximum' && 'Full anonymity mode'}
+                  </p>
                 </button>
               ))}
             </div>
-            <p style={{ fontSize: '0.75rem', color: '#6b7a66' }}>
-              {privacyMode === 'maximum' && 'No local storage. Everything resets when you close the tab.'}
-              {privacyMode === 'enhanced' && 'Minimal storage. Soul name and preferences only.'}
-              {privacyMode === 'standard' && 'Full local storage. Threads and settings persist.'}
-            </p>
+          </div>
+        </div>
+
+        {/* NEW: Secure Mode Toggle */}
+        <div style={{ marginBottom: '1.5rem' }}>
+          <h2 style={{ fontSize: '0.75rem', color: '#6b7a66', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>Security</h2>
+          <div style={{ background: '#1a2e18', border: '1px solid #2d4a2a', borderRadius: '16px', padding: '1.25rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <h3 style={{ fontSize: '0.875rem', fontWeight: 600, color: '#0f0' }}>
+                  🔒 Secure Mode
+                </h3>
+                <p style={{ fontSize: '0.75rem', color: '#6b7a66', marginTop: '0.25rem' }}>
+                  Activate Tor-layer visual encryption
+                </p>
+              </div>
+              <button
+                onClick={toggleSecure}
+                disabled={isTransitioning}
+                style={{
+                  width: '48px',
+                  height: '28px',
+                  borderRadius: '14px',
+                  border: 'none',
+                  background: isSecure ? '#0f0' : '#2d4a2a',
+                  position: 'relative',
+                  cursor: isTransitioning ? 'wait' : 'pointer',
+                  transition: 'background 0.3s',
+                }}
+              >
+                <span style={{
+                  position: 'absolute',
+                  top: '2px',
+                  left: isSecure ? '22px' : '2px',
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '50%',
+                  background: '#000',
+                  transition: 'left 0.3s',
+                }} />
+              </button>
+            </div>
+            {isSecure && (
+              <p style={{
+                fontSize: '0.625rem',
+                color: '#0f0',
+                marginTop: '0.75rem',
+                fontFamily: '"Courier New", monospace',
+              }}>
+                ✓ Secure layer active. You're safe.
+              </p>
+            )}
           </div>
         </div>
 
         <div style={{ marginBottom: '1.5rem' }}>
-          <h2 style={{ fontSize: '0.75rem', color: '#6b7a66', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>Data</h2>
-          <div style={{ background: '#1a2e18', border: '1px solid #2d4a2a', borderRadius: '16px', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <button style={{ width: '100%', padding: '0.75rem', background: '#1a2e18', color: '#e8ede6', border: '1px solid #2d4a2a', borderRadius: '12px', cursor: 'pointer', fontSize: '0.875rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-              📥 Export My Data
-            </button>
-            <button onClick={() => setShowClearConfirm(true)} style={{ width: '100%', padding: '0.75rem', background: 'transparent', color: '#9e7b7b', border: '1px solid #3d2a2a', borderRadius: '12px', cursor: 'pointer', fontSize: '0.875rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-              🗑️ Clear All Data
-            </button>
+          <h2 style={{ fontSize: '0.75rem', color: '#6b7a66', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>Danger Zone</h2>
+          <div style={{ background: '#1a2e18', border: '1px solid #2d4a2a', borderRadius: '16px', padding: '1.25rem' }}>
+            {!showClearConfirm ? (
+              <button onClick={() => setShowClearConfirm(true)} style={{ width: '100%', padding: '0.75rem', background: '#9e7b7b20', color: '#9e7b7b', border: '1px solid #9e7b7b', borderRadius: '8px', cursor: 'pointer', fontSize: '0.875rem' }}>
+                🗑️ Clear All Data
+              </button>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <p style={{ fontSize: '0.875rem', color: '#9e7b7b', marginBottom: '0.5rem' }}>Are you sure? This cannot be undone.</p>
+                <button onClick={clearAllData} style={{ padding: '0.75rem', background: '#9e7b7b', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '0.875rem' }}>Yes, clear everything</button>
+                <button onClick={() => setShowClearConfirm(false)} style={{ padding: '0.75rem', background: '#1a2e18', color: '#a8b5a3', border: '1px solid #2d4a2a', borderRadius: '8px', cursor: 'pointer', fontSize: '0.875rem' }}>Cancel</button>
+              </div>
+            )}
           </div>
         </div>
 
-        <div style={{ textAlign: 'center', paddingTop: '2rem' }}>
-          <p style={{ fontSize: '0.75rem', color: '#6b7a66' }}>SoulHaven v1.0.0</p>
-          <p style={{ fontSize: '0.75rem', color: '#6b7a66', marginTop: '0.25rem' }}>Made with care for humans being human.</p>
+        <div style={{ textAlign: 'center', padding: '2rem 0' }}>
+          <p style={{ fontSize: '0.625rem', color: '#6b7a66' }}>SoulHaven v2.0 • Made with 💚 for healing</p>
         </div>
       </div>
-
-      {showClearConfirm && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
-          <div style={{ background: '#1a2e18', border: '1px solid #2d4a2a', borderRadius: '16px', padding: '1.5rem', maxWidth: '320px', width: '100%' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#9e7b7b', marginBottom: '0.75rem' }}>
-              <span style={{ fontSize: '1.5rem' }}>⚠️</span>
-              <h3 style={{ fontWeight: 600 }}>Clear Everything?</h3>
-            </div>
-            <p style={{ fontSize: '0.875rem', color: '#a8b5a3', marginBottom: '1rem' }}>This will erase your soul name, preferences, and all local data. This cannot be undone.</p>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <button onClick={() => setShowClearConfirm(false)} style={{ flex: 1, padding: '0.5rem', background: '#1a2e18', color: '#a8b5a3', border: '1px solid #2d4a2a', borderRadius: '8px', cursor: 'pointer', fontSize: '0.875rem' }}>Cancel</button>
-              <button onClick={clearAllData} style={{ flex: 1, padding: '0.5rem', background: 'rgba(158,123,123,0.2)', color: '#9e7b7b', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '0.875rem' }}>Clear All</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

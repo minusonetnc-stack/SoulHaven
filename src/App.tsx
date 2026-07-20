@@ -1,4 +1,6 @@
 import { HashRouter, Routes, Route } from 'react-router-dom'
+import { SecureModeProvider, useSecureMode } from './SecureModeContext'
+import PixelWipe from './PixelWipe'
 import LandingPage from './LandingPage'
 import OnboardingPage from './OnboardingPage'
 import SanctuaryPage from './SanctuaryPage'
@@ -10,9 +12,12 @@ import PlayDatesPage from './PlayDatesPage'
 import ResourcesPage from './ResourcesPage'
 import SettingsPage from './SettingsPage'
 
-export default function App() {
+function AppContent() {
+  const { isSecure, isTransitioning } = useSecureMode()
+
   return (
-    <HashRouter>
+    <>
+      <PixelWipe isActive={isSecure || isTransitioning} />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/welcome" element={<OnboardingPage />} />
@@ -25,6 +30,16 @@ export default function App() {
         <Route path="/resources" element={<ResourcesPage />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Routes>
+    </>
+  )
+}
+
+export default function App() {
+  return (
+    <HashRouter>
+      <SecureModeProvider>
+        <AppContent />
+      </SecureModeProvider>
     </HashRouter>
   )
 }
