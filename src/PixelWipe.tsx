@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface PixelWipeProps {
   isActive: boolean
@@ -19,7 +19,6 @@ export default function PixelWipe({ isActive, onComplete, onReverseComplete }: P
   const cutProgressRef = useRef(0)
   const canvasSizeRef = useRef({ w: 0, h: 0 })
 
-  // Track phase changes
   useEffect(() => {
     if (isActive && phase === 'idle') {
       setPhase('wiping')
@@ -31,7 +30,6 @@ export default function PixelWipe({ isActive, onComplete, onReverseComplete }: P
     }
   }, [isActive, phase])
 
-  // Canvas animation
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -56,13 +54,13 @@ export default function PixelWipe({ isActive, onComplete, onReverseComplete }: P
     window.addEventListener('resize', resize)
 
     let lastTime = 0
-    const wipeSpeed = 0.004  // Slower reveal
+    const wipeSpeed = 0.004
     const reverseSpeed = 0.008
 
     const draw = (time: number) => {
       if (!ctx || !canvas) return
       const elapsed = time - lastTime
-      if (elapsed < 16) {  // Cap at ~60fps
+      if (elapsed < 16) {
         animationRef.current = requestAnimationFrame(draw)
         return
       }
@@ -72,7 +70,6 @@ export default function PixelWipe({ isActive, onComplete, onReverseComplete }: P
       const drops = dropsRef.current
       const cutProgress = cutProgressRef.current
 
-      // Semi-transparent black for trail effect
       ctx.fillStyle = 'rgba(0, 0, 0, 0.08)'
       ctx.fillRect(0, 0, w, h)
 
@@ -84,7 +81,6 @@ export default function PixelWipe({ isActive, onComplete, onReverseComplete }: P
         const x = i * 16
         const y = drops[i] * 16
 
-        // "Cut through" effect — carve a widening oval from center
         const centerX = w / 2
         const centerY = h / 2
         const dx = (x - centerX) / (w * 0.3 * cutProgress + 1)
@@ -92,7 +88,6 @@ export default function PixelWipe({ isActive, onComplete, onReverseComplete }: P
         const dist = Math.sqrt(dx * dx + dy * dy)
 
         if (dist < 1.0 && cutProgress > 0.05) {
-          // Inside the cut — fade to black (reveals layer underneath)
           ctx.globalAlpha = Math.max(0, dist - 0.3)
         } else {
           ctx.globalAlpha = Math.min(1, 0.3 + cutProgress * 0.7)
@@ -101,14 +96,12 @@ export default function PixelWipe({ isActive, onComplete, onReverseComplete }: P
         ctx.fillText(char, x, y)
         ctx.globalAlpha = 1
 
-        // Reset drop to top randomly
         if (y > h && Math.random() > 0.985) {
           drops[i] = 0
         }
         drops[i] += 0.5 + Math.random() * 0.5
       }
 
-      // Handle phase transitions
       if (phase === 'wiping') {
         cutProgressRef.current = Math.min(1, cutProgressRef.current + wipeSpeed)
         if (cutProgressRef.current >= 1) {
@@ -144,7 +137,6 @@ export default function PixelWipe({ isActive, onComplete, onReverseComplete }: P
       zIndex: 9998,
       pointerEvents: phase === 'revealed' ? 'none' : 'auto',
     }}>
-      {/* Canvas pixel rain */}
       <canvas
         ref={canvasRef}
         style={{
@@ -156,7 +148,6 @@ export default function PixelWipe({ isActive, onComplete, onReverseComplete }: P
         }}
       />
 
-      {/* Revealed layer underneath */}
       <div style={{
         position: 'absolute',
         inset: 0,
@@ -170,7 +161,6 @@ export default function PixelWipe({ isActive, onComplete, onReverseComplete }: P
         zIndex: 0,
         overflow: 'hidden',
       }}>
-        {/* Fine-line SVG Logo */}
         {showContent && (
           <div style={{
             animation: 'logoFadeIn 2s ease-out forwards',
@@ -178,67 +168,52 @@ export default function PixelWipe({ isActive, onComplete, onReverseComplete }: P
             maxWidth: '90vw',
             padding: '2rem',
           }}>
-            {/* SVG: Fine-line onion + SH monogram */}
-            <svg
-              width="120"
-              height="140"
-              viewBox="0 0 120 140"
+            <svg 
+              width="140" 
+              height="160" 
+              viewBox="0 0 140 160" 
               style={{ margin: '0 auto 1.5rem', display: 'block' }}
             >
-              {/* Onion outline — fine lines */}
-              <g fill="none" stroke="#0f0" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round">
-                {/* Onion body */}
-                <path d="M60 20 C60 20, 30 35, 30 70 C30 105, 45 125, 60 130 C75 125, 90 105, 90 70 C90 35, 60 20, 60 20Z" />
-                {/* Inner layers */}
-                <path d="M60 30 C60 30, 40 42, 40 70 C40 98, 50 115, 60 120 C70 115, 80 98, 80 70 C80 42, 60 30, 60 30Z" opacity="0.6" />
-                <path d="M60 42 C60 42, 48 50, 48 70 C48 90, 54 105, 60 108 C66 105, 72 90, 72 70 C72 50, 60 42, 60 42Z" opacity="0.4" />
-                {/* Stem */}
-                <path d="M58 20 L58 8 L62 8 L62 20" />
-                <path d="M56 12 L64 12" opacity="0.5" />
-                {/* Roots */}
-                <path d="M55 128 Q52 135 50 138" opacity="0.4" />
-                <path d="M60 130 L60 138" opacity="0.4" />
-                <path d="M65 128 Q68 135 70 138" opacity="0.4" />
+              <g fill="none" stroke="#4ade80" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" opacity="0.9">
+                <path d="M70 15 C70 15, 25 40, 25 85 C25 125, 45 145, 70 150 C95 145, 115 125, 115 85 C115 40, 70 15, 70 15Z" />
+                <path d="M70 25 C70 25, 35 45, 35 85 C35 120, 50 138, 70 142 C90 138, 105 120, 105 85 C105 45, 70 25, 70 25Z" opacity="0.7" />
+                <path d="M70 35 C70 35, 45 50, 45 85 C45 115, 55 130, 70 134 C85 130, 95 115, 95 85 C95 50, 70 35, 70 35Z" opacity="0.5" />
               </g>
 
-              {/* SH monogram inside — fine, elegant */}
-              <text
-                x="60"
-                y="85"
-                textAnchor="middle"
-                fill="none"
-                stroke="#0f0"
-                strokeWidth="0.6"
-                fontFamily="Georgia, serif"
-                fontSize="28"
-                fontStyle="italic"
-                opacity="0.9"
-              >
-                SH
-              </text>
+              <g fill="none" stroke="#4ade80" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M70 134 L70 90" />
+                <path d="M70 110 Q55 100, 50 85 Q48 75, 55 70 Q62 68, 68 80 L70 85" />
+                <path d="M55 70 Q52 78, 58 82" opacity="0.6" />
+                <path d="M70 100 Q85 90, 90 75 Q92 65, 85 60 Q78 58, 72 70 L70 75" />
+                <path d="M85 60 Q88 68, 82 72" opacity="0.6" />
+                <path d="M70 90 Q65 70, 68 55 Q70 45, 75 50 Q78 55, 72 65 L70 75" />
+                <path d="M70 55 Q73 62, 70 68" opacity="0.6" />
+                <path d="M55 70 L62 78" opacity="0.4" strokeWidth="0.6" />
+                <path d="M85 60 L78 68" opacity="0.4" strokeWidth="0.6" />
+                <path d="M70 55 L70 65" opacity="0.4" strokeWidth="0.6" />
+              </g>
 
-              {/* Decorative dots */}
-              <circle cx="60" cy="110" r="1.5" fill="#0f0" opacity="0.6" />
-              <circle cx="45" cy="60" r="1" fill="#0f0" opacity="0.3" />
-              <circle cx="75" cy="60" r="1" fill="#0f0" opacity="0.3" />
+              <circle cx="30" cy="80" r="1" fill="#4ade80" opacity="0.3" />
+              <circle cx="110" cy="80" r="1" fill="#4ade80" opacity="0.3" />
+              <circle cx="70" cy="155" r="1.5" fill="#4ade80" opacity="0.4" />
             </svg>
 
             <h1 style={{
               fontFamily: '"Courier New", monospace',
-              fontSize: 'clamp(1rem, 3vw, 1.5rem)',
-              color: '#0f0',
-              letterSpacing: '0.4em',
+              fontSize: 'clamp(1.2rem, 4vw, 1.8rem)',
+              color: '#4ade80',
+              letterSpacing: '0.25em',
               textTransform: 'uppercase',
               marginBottom: '0.5rem',
               fontWeight: 300,
-              textShadow: '0 0 15px #0f040',
+              textShadow: '0 0 20px rgba(74, 222, 128, 0.3)',
             }}>
-              SOULHAVEN
+              SoulHaven
             </h1>
             <p style={{
               fontFamily: '"Courier New", monospace',
               fontSize: 'clamp(0.625rem, 2vw, 0.875rem)',
-              color: '#0f0',
+              color: '#4ade80',
               opacity: 0.6,
               letterSpacing: '0.3em',
               fontWeight: 300,
@@ -248,7 +223,6 @@ export default function PixelWipe({ isActive, onComplete, onReverseComplete }: P
           </div>
         )}
 
-        {/* "You're safe" notice */}
         {showContent && (
           <div style={{
             position: 'absolute',
@@ -263,14 +237,14 @@ export default function PixelWipe({ isActive, onComplete, onReverseComplete }: P
           }}>
             <div style={{
               padding: '1rem 1.5rem',
-              border: '1px solid #0f0',
+              border: '1px solid #4ade80',
               borderRadius: '2px',
               background: 'rgba(0, 255, 0, 0.03)',
             }}>
               <p style={{
                 fontFamily: '"Courier New", monospace',
                 fontSize: 'clamp(0.875rem, 2.5vw, 1.125rem)',
-                color: '#0f0',
+                color: '#4ade80',
                 margin: 0,
                 fontWeight: 300,
                 letterSpacing: '0.1em',
@@ -281,7 +255,7 @@ export default function PixelWipe({ isActive, onComplete, onReverseComplete }: P
               <p style={{
                 fontFamily: '"Courier New", monospace',
                 fontSize: 'clamp(0.5rem, 1.5vw, 0.625rem)',
-                color: '#0f0',
+                color: '#4ade80',
                 opacity: 0.5,
                 marginTop: '0.5rem',
                 letterSpacing: '0.15em',
@@ -292,39 +266,8 @@ export default function PixelWipe({ isActive, onComplete, onReverseComplete }: P
             </div>
           </div>
         )}
-
-        {/* Exit button — click to toggle off */}
-        {showContent && (
-          <button
-            onClick={() => {
-              // We need to toggle back off — but this component doesn't have access to toggleSecure
-              // So we dispatch a custom event that App.tsx listens for
-              window.dispatchEvent(new CustomEvent('toggleSecureMode'))
-            }}
-            style={{
-              position: 'absolute',
-              top: '1.5rem',
-              right: '1.5rem',
-              background: 'transparent',
-              border: '1px solid #0f0',
-              color: '#0f0',
-              padding: '0.5rem 1rem',
-              fontFamily: '"Courier New", monospace',
-              fontSize: '0.75rem',
-              cursor: 'pointer',
-              opacity: 0.6,
-              transition: 'opacity 0.3s',
-              zIndex: 10,
-            }}
-            onMouseEnter={e => e.currentTarget.style.opacity = '1'}
-            onMouseLeave={e => e.currentTarget.style.opacity = '0.6'}
-          >
-            [EXIT]
-          </button>
-        )}
       </div>
 
-      {/* Keyframe styles */}
       <style>{`
         @keyframes logoFadeIn {
           0% { opacity: 0; transform: translateY(20px) scale(0.95); }

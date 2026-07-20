@@ -4,8 +4,8 @@ export interface SoulIdentity {
   soulEmoji: string
   createdAt: number
   isAnonymous: boolean
-  feeling?: string      // NEW
-  tagline?: string      // NEW
+  feeling?: string
+  tagline?: string
 }
 
 export interface Message {
@@ -16,8 +16,8 @@ export interface Message {
   content: string
   type: 'text' | 'system'
   timestamp: number
-  feeling?: string      // NEW
-  tagline?: string      // NEW
+  feeling?: string
+  tagline?: string
 }
 
 export interface Thread {

@@ -51,8 +51,6 @@ export default function SanctuaryPage() {
   return (
     <div style={{ minHeight: '100vh', background: '#0a0f0a', color: '#e8ede6', paddingBottom: '80px' }}>
       <div style={{ maxWidth: '800px', margin: '0 auto', padding: '1.5rem' }}>
-
-        {/* HEADER */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <span style={{ fontSize: '2rem' }}>{identity.soulEmoji}</span>
@@ -75,7 +73,6 @@ export default function SanctuaryPage() {
           </button>
         </div>
 
-        {/* FEELING + TAGLINE BOX */}
         <div style={{ background: '#1a2e18', border: '1px solid #2d4a2a', borderRadius: '16px', padding: '1.25rem', marginBottom: '1.5rem' }}>
           <p style={{ fontSize: '0.875rem', color: '#a8b5a3', marginBottom: '0.75rem' }}>
             ✨ How is today feeling? <span style={{ color: '#6b7a66' }}>(optional)</span>
@@ -122,7 +119,6 @@ export default function SanctuaryPage() {
           </p>
         </div>
 
-        {/* ROOMS */}
         <div style={{ marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
             <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#7fb069', fontFamily: 'Georgia, serif' }}>💬 Healing Rooms</h2>
@@ -149,7 +145,6 @@ export default function SanctuaryPage() {
           </div>
         </div>
 
-        {/* NAV CARDS */}
         <div style={{ display: 'grid', gap: '0.75rem' }}>
           <button onClick={() => navigate('/threads')} style={{ background: '#1a2e18', border: '1px solid #2d4a2a', borderRadius: '16px', padding: '1rem', textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <span style={{ fontSize: '1.25rem' }}>📖</span>
@@ -175,7 +170,6 @@ export default function SanctuaryPage() {
         </div>
       </div>
 
-      {/* SECRET GATE — hidden black period */}
       <span
         onClick={() => { setShowGate(true); setGateError(''); setPassphrase('') }}
         style={{
@@ -193,7 +187,6 @@ export default function SanctuaryPage() {
         .
       </span>
 
-      {/* TERMINAL GATE MODAL */}
       {showGate && (
         <div style={{
           position: 'fixed',
@@ -216,7 +209,9 @@ export default function SanctuaryPage() {
             fontFamily: '"Courier New", monospace',
           }}>
             <div style={{ color: '#0f0', marginBottom: '1rem', fontSize: '0.875rem', lineHeight: 1.6, whiteSpace: 'pre-line' }}>
-              {`> ACCESS SANCTUARY\n> AUTHORIZATION REQUIRED\n> ENTER PASSPHRASE:`}
+              {`> ACCESS SANCTUARY
+> AUTHORIZATION REQUIRED
+> ENTER PASSPHRASE:`}
             </div>
             <input
               type="password"
@@ -279,7 +274,6 @@ export default function SanctuaryPage() {
         </div>
       )}
 
-      {/* BOTTOM NAV */}
       <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(10,15,10,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #2d4a2a', padding: '0.5rem', zIndex: 50 }}>
         <div style={{ maxWidth: '600px', margin: '0 auto', display: 'flex', justifyContent: 'space-around' }}>
           {NAV_ITEMS.map(item => (

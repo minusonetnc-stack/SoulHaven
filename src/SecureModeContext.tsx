@@ -19,7 +19,6 @@ export function SecureModeProvider({ children }: { children: ReactNode }) {
   const toggleSecure = useCallback(() => {
     setIsTransitioning(true)
     setIsSecure(prev => !prev)
-    // Transition takes ~2 seconds
     setTimeout(() => setIsTransitioning(false), 2500)
   }, [])
 

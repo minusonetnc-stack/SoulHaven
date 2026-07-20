@@ -49,7 +49,6 @@ app.use('/api/', limiter)
 const rooms = new Map()
 const activeUsers = new Map()
 
-// API Routes
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
 })
@@ -144,7 +143,6 @@ app.post('/api/playdates', async (req, res) => {
   }
 })
 
-// Socket.IO for real-time chat
 io.on('connection', (socket) => {
   console.log('Socket connected:', socket.id)
 
@@ -156,7 +154,6 @@ io.on('connection', (socket) => {
 
     socket.to(roomId).emit('user-joined', { soulName, timestamp: Date.now() })
 
-    // Send welcome message
     socket.emit('message', {
       id: `system-${Date.now()}`,
       roomId,
@@ -167,7 +164,6 @@ io.on('connection', (socket) => {
       timestamp: Date.now(),
     })
 
-    // Load recent messages from database
     try {
       const history = await getMessages(roomId)
       history.forEach(msg => {
@@ -196,10 +192,7 @@ io.on('connection', (socket) => {
 
   socket.on('send-message', async (message) => {
     try {
-      // Save to database
       const saved = await saveMessage(message)
-
-      // Broadcast to room
       io.to(message.roomId).emit('message', {
         id: saved.id,
         roomId: message.roomId,
@@ -213,7 +206,6 @@ io.on('connection', (socket) => {
       })
     } catch (err) {
       console.error('Save message error:', err)
-      // Still broadcast even if DB save fails
       io.to(message.roomId).emit('message', {
         ...message,
         id: `${socket.id}-${Date.now()}`,

@@ -44,7 +44,6 @@ export async function saveMessage(msg) {
 }
 
 export async function getThreads(category = null) {
-  // Simplified: don't embed replies, just get threads
   let query = supabase
     .from('threads')
     .select('*')

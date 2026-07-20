@@ -11,21 +11,38 @@ import ThreadDetailPage from './ThreadDetailPage'
 import PlayDatesPage from './PlayDatesPage'
 import ResourcesPage from './ResourcesPage'
 import SettingsPage from './SettingsPage'
-import { useEffect } from 'react'
 
 function AppContent() {
   const { isSecure, toggleSecure, isTransitioning } = useSecureMode()
 
-  // Listen for exit button from PixelWipe
-  useEffect(() => {
-    const handleExit = () => toggleSecure()
-    window.addEventListener('toggleSecureMode', handleExit)
-    return () => window.removeEventListener('toggleSecureMode', handleExit)
-  }, [toggleSecure])
-
   return (
     <>
       <PixelWipe isActive={isSecure || isTransitioning} />
+      {/* Exit button for secure mode — sits on top of everything */}
+      {isSecure && !isTransitioning && (
+        <button
+          onClick={toggleSecure}
+          style={{
+            position: 'fixed',
+            top: '1rem',
+            right: '1rem',
+            zIndex: 9999,
+            background: 'transparent',
+            border: '1px solid #4ade80',
+            color: '#4ade80',
+            padding: '0.5rem 1rem',
+            fontFamily: '"Courier New", monospace',
+            fontSize: '0.75rem',
+            cursor: 'pointer',
+            opacity: 0.6,
+            transition: 'opacity 0.3s',
+          }}
+          onMouseEnter={e => e.currentTarget.style.opacity = '1'}
+          onMouseLeave={e => e.currentTarget.style.opacity = '0.6'}
+        >
+          [EXIT]
+        </button>
+      )}
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/welcome" element={<OnboardingPage />} />

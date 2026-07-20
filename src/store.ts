@@ -11,8 +11,8 @@ interface Store {
   clearIdentity: () => void
   setTheme: (t: 'dark' | 'light') => void
   setPrivacyMode: (m: 'standard' | 'enhanced' | 'maximum') => void
-  setFeeling: (f: string) => void      // NEW
-  setTagline: (t: string) => void     // NEW
+  setFeeling: (f: string) => void
+  setTagline: (t: string) => void
   clearAllData: () => void
 }
 
@@ -36,10 +36,10 @@ export const useStore = create<Store>()(
       clearIdentity: () => set({ identity: null, isOnboarded: false }),
       setTheme: (t) => set({ theme: t }),
       setPrivacyMode: (m) => set({ privacyMode: m }),
-      setFeeling: (feeling) => set((s) => ({   // NEW
+      setFeeling: (feeling) => set((s) => ({
         identity: s.identity ? { ...s.identity, feeling } : null
       })),
-      setTagline: (tagline) => set((s) => ({  // NEW
+      setTagline: (tagline) => set((s) => ({
         identity: s.identity ? { ...s.identity, tagline: tagline.slice(0, 30) } : null
       })),
       clearAllData: () => { localStorage.clear(); window.location.reload() }

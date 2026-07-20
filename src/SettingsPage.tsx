@@ -77,7 +77,6 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* NEW: Secure Mode Toggle */}
         <div style={{ marginBottom: '1.5rem' }}>
           <h2 style={{ fontSize: '0.75rem', color: '#6b7a66', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>Security</h2>
           <div style={{ background: '#1a2e18', border: '1px solid #2d4a2a', borderRadius: '16px', padding: '1.25rem' }}>
@@ -117,9 +116,9 @@ export default function SettingsPage() {
               </button>
             </div>
             {isSecure && (
-              <p style={{
-                fontSize: '0.625rem',
-                color: '#0f0',
+              <p style={{ 
+                fontSize: '0.625rem', 
+                color: '#0f0', 
                 marginTop: '0.75rem',
                 fontFamily: '"Courier New", monospace',
               }}>
@@ -147,7 +146,7 @@ export default function SettingsPage() {
         </div>
 
         <div style={{ textAlign: 'center', padding: '2rem 0' }}>
-          <p style={{ fontSize: '0.625rem', color: '#6b7a66' }}>SoulHaven v2.0 • Made with 💚 for healing</p>
+          <p style={{ fontSize: '0.625rem', color: '#6b7a66' }}>SoulHaven v2.2 • Made with 💚 for healing</p>
         </div>
       </div>
     </div>
