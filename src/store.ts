@@ -11,6 +11,8 @@ interface Store {
   clearIdentity: () => void
   setTheme: (t: 'dark' | 'light') => void
   setPrivacyMode: (m: 'standard' | 'enhanced' | 'maximum') => void
+  setFeeling: (f: string) => void      // NEW
+  setTagline: (t: string) => void     // NEW
   clearAllData: () => void
 }
 
@@ -34,6 +36,12 @@ export const useStore = create<Store>()(
       clearIdentity: () => set({ identity: null, isOnboarded: false }),
       setTheme: (t) => set({ theme: t }),
       setPrivacyMode: (m) => set({ privacyMode: m }),
+      setFeeling: (feeling) => set((s) => ({   // NEW
+        identity: s.identity ? { ...s.identity, feeling } : null
+      })),
+      setTagline: (tagline) => set((s) => ({  // NEW
+        identity: s.identity ? { ...s.identity, tagline: tagline.slice(0, 30) } : null
+      })),
       clearAllData: () => { localStorage.clear(); window.location.reload() }
     }),
     { name: 'soulhaven', partialize: (s) => ({ identity: s.identity, isOnboarded: s.isOnboarded, theme: s.theme, privacyMode: s.privacyMode }) }

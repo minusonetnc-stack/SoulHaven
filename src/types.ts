@@ -4,6 +4,8 @@ export interface SoulIdentity {
   soulEmoji: string
   createdAt: number
   isAnonymous: boolean
+  feeling?: string      // NEW
+  tagline?: string      // NEW
 }
 
 export interface Message {
@@ -14,6 +16,8 @@ export interface Message {
   content: string
   type: 'text' | 'system'
   timestamp: number
+  feeling?: string      // NEW
+  tagline?: string      // NEW
 }
 
 export interface Thread {
@@ -26,6 +30,7 @@ export interface Thread {
   replies: { id: string; author: string; authorColor: string; content: string; createdAt: number }[]
   createdAt: number
   isPinned: boolean
+  replyCount?: number
 }
 
 export interface PlayDate {

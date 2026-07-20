@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from './store'
 
@@ -21,24 +22,52 @@ const NAV_ITEMS = [
   { path: '/settings', label: 'Settings', icon: '⚙️' },
 ]
 
+const FEELINGS = ['Okay', 'Struggling', 'Hopeful', 'Lonely', 'Grateful', 'Overwhelmed', 'Excited', 'Tired']
+
 export default function SanctuaryPage() {
   const navigate = useNavigate()
-  const { identity, clearIdentity } = useStore()
+  const { identity, clearIdentity, setFeeling, setTagline } = useStore()
+  const [showGate, setShowGate] = useState(false)
+  const [passphrase, setPassphrase] = useState('')
+  const [gateError, setGateError] = useState('')
 
   if (!identity) {
     navigate('/')
     return null
   }
 
+  const handleGate = () => {
+    const valid = passphrase.toLowerCase().trim()
+    if (valid === 'haven' || valid === 'soulhaven2025') {
+      setShowGate(false)
+      setPassphrase('')
+      setGateError('')
+      navigate('/room/sanctuary')
+    } else {
+      setGateError('> ACCESS DENIED')
+    }
+  }
+
   return (
     <div style={{ minHeight: '100vh', background: '#0a0f0a', color: '#e8ede6', paddingBottom: '80px' }}>
       <div style={{ maxWidth: '800px', margin: '0 auto', padding: '1.5rem' }}>
+
+        {/* HEADER */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <span style={{ fontSize: '2rem' }}>{identity.soulEmoji}</span>
             <div>
-              <h1 style={{ fontSize: '1.25rem', fontWeight: 600, fontFamily: 'Georgia, serif' }}>Welcome, {identity.soulName}</h1>
-              <p style={{ fontSize: '0.75rem', color: '#6b7a66' }}>Your sanctuary awaits</p>
+              <h1 style={{ fontSize: '1.25rem', fontWeight: 600, fontFamily: 'Georgia, serif' }}>
+                {identity.soulName}
+                {identity.tagline && (
+                  <span style={{ fontSize: '0.75rem', color: '#6b7a66', fontWeight: 400, marginLeft: '0.5rem', fontStyle: 'italic' }}>
+                    "{identity.tagline}"
+                  </span>
+                )}
+              </h1>
+              <p style={{ fontSize: '0.75rem', color: '#6b7a66' }}>
+                {identity.feeling ? `feeling ${identity.feeling.toLowerCase()}` : 'Your sanctuary awaits'}
+              </p>
             </div>
           </div>
           <button onClick={clearIdentity} style={{ padding: '0.5rem', background: 'transparent', color: '#6b7a66', border: 'none', cursor: 'pointer', fontSize: '0.875rem' }}>
@@ -46,17 +75,54 @@ export default function SanctuaryPage() {
           </button>
         </div>
 
+        {/* FEELING + TAGLINE BOX */}
         <div style={{ background: '#1a2e18', border: '1px solid #2d4a2a', borderRadius: '16px', padding: '1.25rem', marginBottom: '1.5rem' }}>
-          <p style={{ fontSize: '0.875rem', color: '#a8b5a3', marginBottom: '0.75rem' }}>✨ How is today feeling? <span style={{ color: '#6b7a66' }}>(optional)</span></p>
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-            {['Okay', 'Struggling', 'Hopeful', 'Lonely', 'Grateful', 'Overwhelmed', 'Excited', 'Tired'].map(mood => (
-              <button key={mood} style={{ padding: '0.375rem 0.875rem', borderRadius: '999px', fontSize: '0.75rem', background: '#0a0f0a', color: '#a8b5a3', border: '1px solid #2d4a2a', cursor: 'pointer' }}>
+          <p style={{ fontSize: '0.875rem', color: '#a8b5a3', marginBottom: '0.75rem' }}>
+            ✨ How is today feeling? <span style={{ color: '#6b7a66' }}>(optional)</span>
+          </p>
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
+            {FEELINGS.map(mood => (
+              <button
+                key={mood}
+                onClick={() => setFeeling(mood)}
+                style={{
+                  padding: '0.375rem 0.875rem',
+                  borderRadius: '999px',
+                  fontSize: '0.75rem',
+                  background: identity.feeling === mood ? (identity.soulColor + '40') : '#0a0f0a',
+                  color: identity.feeling === mood ? identity.soulColor : '#a8b5a3',
+                  border: identity.feeling === mood ? `1px solid ${identity.soulColor}` : '1px solid #2d4a2a',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  fontWeight: identity.feeling === mood ? 600 : 400,
+                }}
+              >
                 {mood}
               </button>
             ))}
           </div>
+          <input
+            value={identity.tagline || ''}
+            onChange={e => setTagline(e.target.value)}
+            placeholder="Short tagline (e.g., 'just breathing')..."
+            maxLength={30}
+            style={{
+              width: '100%',
+              padding: '0.5rem 0.75rem',
+              background: '#0a0f0a',
+              border: '1px solid #2d4a2a',
+              borderRadius: '8px',
+              color: '#e8ede6',
+              fontSize: '0.75rem',
+              outline: 'none',
+            }}
+          />
+          <p style={{ fontSize: '0.625rem', color: '#6b7a66', marginTop: '0.25rem', textAlign: 'right' }}>
+            {(identity.tagline || '').length}/30
+          </p>
         </div>
 
+        {/* ROOMS */}
         <div style={{ marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
             <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#7fb069', fontFamily: 'Georgia, serif' }}>💬 Healing Rooms</h2>
@@ -83,6 +149,7 @@ export default function SanctuaryPage() {
           </div>
         </div>
 
+        {/* NAV CARDS */}
         <div style={{ display: 'grid', gap: '0.75rem' }}>
           <button onClick={() => navigate('/threads')} style={{ background: '#1a2e18', border: '1px solid #2d4a2a', borderRadius: '16px', padding: '1rem', textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <span style={{ fontSize: '1.25rem' }}>📖</span>
@@ -108,6 +175,111 @@ export default function SanctuaryPage() {
         </div>
       </div>
 
+      {/* SECRET GATE — hidden black period */}
+      <span
+        onClick={() => { setShowGate(true); setGateError(''); setPassphrase('') }}
+        style={{
+          position: 'fixed',
+          bottom: '80px',
+          right: '12px',
+          color: '#0d0d0d',
+          fontSize: '10px',
+          cursor: 'pointer',
+          userSelect: 'none',
+          zIndex: 40,
+        }}
+        title="."
+      >
+        .
+      </span>
+
+      {/* TERMINAL GATE MODAL */}
+      {showGate && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 100,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '1rem',
+          background: 'rgba(0,0,0,0.85)',
+          backdropFilter: 'blur(4px)',
+        }}>
+          <div style={{
+            background: '#000',
+            border: '1px solid #0f0',
+            borderRadius: '4px',
+            padding: '2rem',
+            maxWidth: '400px',
+            width: '100%',
+            fontFamily: '"Courier New", monospace',
+          }}>
+            <div style={{ color: '#0f0', marginBottom: '1rem', fontSize: '0.875rem', lineHeight: 1.6, whiteSpace: 'pre-line' }}>
+              {`> ACCESS SANCTUARY\n> AUTHORIZATION REQUIRED\n> ENTER PASSPHRASE:`}
+            </div>
+            <input
+              type="password"
+              value={passphrase}
+              onChange={e => setPassphrase(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleGate()}
+              autoFocus
+              style={{
+                width: '100%',
+                background: '#000',
+                color: '#0f0',
+                border: 'none',
+                borderBottom: '1px solid #0f0',
+                padding: '0.5rem 0',
+                fontFamily: '"Courier New", monospace',
+                fontSize: '0.875rem',
+                outline: 'none',
+                marginBottom: '1rem',
+              }}
+            />
+            {gateError && (
+              <div style={{ color: '#f00', fontSize: '0.75rem', marginBottom: '1rem' }}>
+                {gateError}
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button
+                onClick={() => setShowGate(false)}
+                style={{
+                  flex: 1,
+                  padding: '0.5rem',
+                  background: 'transparent',
+                  color: '#0f0',
+                  border: '1px solid #0f0',
+                  fontFamily: '"Courier New", monospace',
+                  fontSize: '0.75rem',
+                  cursor: 'pointer',
+                }}
+              >
+                [ABORT]
+              </button>
+              <button
+                onClick={handleGate}
+                style={{
+                  flex: 1,
+                  padding: '0.5rem',
+                  background: '#0f0',
+                  color: '#000',
+                  border: 'none',
+                  fontFamily: '"Courier New", monospace',
+                  fontSize: '0.75rem',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                }}
+              >
+                [ENTER]
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* BOTTOM NAV */}
       <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(10,15,10,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #2d4a2a', padding: '0.5rem', zIndex: 50 }}>
         <div style={{ maxWidth: '600px', margin: '0 auto', display: 'flex', justifyContent: 'space-around' }}>
           {NAV_ITEMS.map(item => (

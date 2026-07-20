@@ -89,7 +89,7 @@ app.get('/api/threads', async (req, res) => {
     res.json(threads)
   } catch (err) {
     console.error('Threads error:', err)
-    res.status(500).json({ error: 'Failed to fetch threads' })
+    res.status(500).json({ error: 'Failed to fetch threads', details: err.message })
   }
 })
 
@@ -99,7 +99,7 @@ app.get('/api/threads/:id', async (req, res) => {
     res.json(thread)
   } catch (err) {
     console.error('Thread error:', err)
-    res.status(500).json({ error: 'Failed to fetch thread' })
+    res.status(500).json({ error: 'Failed to fetch thread', details: err.message })
   }
 })
 
@@ -109,7 +109,7 @@ app.post('/api/threads', async (req, res) => {
     res.json(thread)
   } catch (err) {
     console.error('Create thread error:', err)
-    res.status(500).json({ error: 'Failed to create thread' })
+    res.status(500).json({ error: 'Failed to create thread', details: err.message })
   }
 })
 
@@ -119,7 +119,7 @@ app.post('/api/threads/:id/replies', async (req, res) => {
     res.json(reply)
   } catch (err) {
     console.error('Create reply error:', err)
-    res.status(500).json({ error: 'Failed to create reply' })
+    res.status(500).json({ error: 'Failed to create reply', details: err.message })
   }
 })
 
@@ -148,11 +148,11 @@ app.post('/api/playdates', async (req, res) => {
 io.on('connection', (socket) => {
   console.log('Socket connected:', socket.id)
 
-  socket.on('join-room', async ({ roomId, soulName, soulColor }) => {
+  socket.on('join-room', async ({ roomId, soulName, soulColor, feeling, tagline }) => {
     socket.join(roomId)
     if (!rooms.has(roomId)) rooms.set(roomId, new Set())
     rooms.get(roomId).add(socket.id)
-    activeUsers.set(socket.id, { soulName, soulColor, roomId })
+    activeUsers.set(socket.id, { soulName, soulColor, roomId, feeling, tagline })
 
     socket.to(roomId).emit('user-joined', { soulName, timestamp: Date.now() })
 
@@ -178,6 +178,8 @@ io.on('connection', (socket) => {
           soulColor: msg.soul_color,
           content: msg.content,
           type: msg.type,
+          feeling: msg.feeling,
+          tagline: msg.tagline,
           timestamp: new Date(msg.created_at).getTime(),
         })
       })
@@ -205,6 +207,8 @@ io.on('connection', (socket) => {
         soulColor: message.soulColor,
         content: message.content,
         type: message.type,
+        feeling: message.feeling,
+        tagline: message.tagline,
         timestamp: new Date(saved.created_at).getTime(),
       })
     } catch (err) {

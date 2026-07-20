@@ -5,7 +5,6 @@ const supabaseKey = process.env.SUPABASE_SERVICE_KEY || 'your-service-key'
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
-// Database helper functions
 export async function getRooms() {
   const { data, error } = await supabase
     .from('rooms')
@@ -35,6 +34,8 @@ export async function saveMessage(msg) {
       soul_color: msg.soulColor,
       content: msg.content,
       type: msg.type || 'text',
+      feeling: msg.feeling || null,
+      tagline: msg.tagline || null,
     }])
     .select()
     .single()
@@ -43,10 +44,17 @@ export async function saveMessage(msg) {
 }
 
 export async function getThreads(category = null) {
-  let query = supabase.from('threads').select('*, replies(*)').order('is_pinned', { ascending: false }).order('created_at', { ascending: false })
+  // Simplified: don't embed replies, just get threads
+  let query = supabase
+    .from('threads')
+    .select('*')
+    .order('is_pinned', { ascending: false })
+    .order('created_at', { ascending: false })
+
   if (category && category !== 'All') {
     query = query.eq('category', category)
   }
+
   const { data, error } = await query
   if (error) throw error
   return data || []

@@ -13,6 +13,7 @@ const ROOM_META: Record<string, { name: string; emoji: string; welcome: string }
   green: { name: 'Green Room', emoji: '🌲', welcome: 'Chill vibes, good people.' },
   night: { name: 'Night Watch', emoji: '🌙', welcome: '3am thoughts welcome.' },
   new: { name: 'New Beginnings', emoji: '☀️', welcome: 'Every sunrise is a fresh start.' },
+  sanctuary: { name: 'The Sanctuary', emoji: '🔒', welcome: 'Authorized souls only. Be kind. Be real.' },
 }
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
@@ -42,6 +43,8 @@ export default function RoomChatPage() {
         roomId,
         soulName: identity.soulName,
         soulColor: identity.soulColor,
+        feeling: identity.feeling,
+        tagline: identity.tagline,
       })
     })
 
@@ -82,6 +85,8 @@ export default function RoomChatPage() {
       soulColor: identity.soulColor,
       content: input.trim(),
       type: 'text',
+      feeling: identity.feeling,
+      tagline: identity.tagline,
     })
     socketRef.current.emit('typing', { roomId, soulName: identity.soulName })
     setInput('')
@@ -127,8 +132,14 @@ export default function RoomChatPage() {
                 {msg.soulName[0]}
               </div>
               <div style={{ maxWidth: '75%', display: 'flex', flexDirection: 'column', alignItems: isMe ? 'flex-end' : 'flex-start' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
                   <span style={{ fontSize: '0.625rem', fontWeight: 600, color: msg.soulColor }}>{msg.soulName}</span>
+                  {msg.tagline && (
+                    <span style={{ fontSize: '0.625rem', color: '#6b7a66', fontStyle: 'italic' }}>"{msg.tagline}"</span>
+                  )}
+                  {msg.feeling && (
+                    <span style={{ fontSize: '0.625rem', color: msg.soulColor + 'aa' }}>— {msg.feeling}</span>
+                  )}
                   <span style={{ fontSize: '0.625rem', color: '#6b7a66' }}>
                     {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
