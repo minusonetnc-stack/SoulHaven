@@ -1,17 +1,13 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.SUPABASE_URL
-const supabaseKey = process.env.SUPABASE_SERVICE_KEY
-
-if (!supabaseUrl || !supabaseKey) {
-  console.error('Missing SUPABASE_URL or SUPABASE_SERVICE_KEY')
-}
+const supabaseUrl = 'https://eamdjmxyawihriulswht.supabase.co'
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVhbWRqbXh5YXdpaHJpdWxzd2h0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MzQ1ODEyNiwiZXhwIjoyMDk5MDM0MTI2fQ.tqXo2Q5G4fwVpDDpf_DiHDl7Vu5WbPmyiUlSHsE89gA'
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
 export async function getRooms() {
   const { data, error } = await supabase.from('rooms').select('*').order('name')
-  if (error) { console.error('getRooms error:', error); throw error }
+  if (error) throw error
   return data || []
 }
 
@@ -19,7 +15,7 @@ export async function getMessages(roomId, limit = 50) {
   const { data, error } = await supabase
     .from('messages').select('*').eq('room_id', roomId)
     .order('created_at', { ascending: false }).limit(limit)
-  if (error) { console.error('getMessages error:', error); throw error }
+  if (error) throw error
   return (data || []).reverse()
 }
 
@@ -33,7 +29,7 @@ export async function saveMessage(msg) {
     tagline: msg.tagline || null,
     feeling: msg.feeling || null,
   }]).select().single()
-  if (error) { console.error('saveMessage error:', error); throw error }
+  if (error) throw error
   return data
 }
 
@@ -43,19 +39,15 @@ export async function getThreads(category = null) {
     .order('created_at', { ascending: false })
   if (category && category !== 'All') query = query.eq('category', category)
   const { data, error } = await query
-  if (error) { console.error('getThreads error:', error); throw error }
+  if (error) throw error
   return data || []
 }
 
 export async function getThread(id) {
-  const { data: thread, error: threadError } = await supabase
-    .from('threads').select('*').eq('id', id).single()
-  if (threadError) { console.error('getThread error:', threadError); throw threadError }
-
-  const { data: replies, error: repliesError } = await supabase
-    .from('replies').select('*').eq('thread_id', id).order('created_at', { ascending: true })
-  if (repliesError) { console.error('getReplies error:', repliesError); throw repliesError }
-
+  const { data: thread, error: tErr } = await supabase.from('threads').select('*').eq('id', id).single()
+  if (tErr) throw tErr
+  const { data: replies, error: rErr } = await supabase.from('replies').select('*').eq('thread_id', id).order('created_at', { ascending: true })
+  if (rErr) throw rErr
   return { ...thread, replies: replies || [] }
 }
 
@@ -64,7 +56,7 @@ export async function createThread(thread) {
     title: thread.title, author: thread.author,
     author_color: thread.authorColor, content: thread.content, category: thread.category,
   }]).select().single()
-  if (error) { console.error('createThread error:', error); throw error }
+  if (error) throw error
   return data
 }
 
@@ -73,13 +65,13 @@ export async function createReply(reply) {
     thread_id: reply.threadId, author: reply.author,
     author_color: reply.authorColor, content: reply.content,
   }]).select().single()
-  if (error) { console.error('createReply error:', error); throw error }
+  if (error) throw error
   return data
 }
 
 export async function getPlayDates() {
   const { data, error } = await supabase.from('play_dates').select('*').order('date_time', { ascending: true })
-  if (error) { console.error('getPlayDates error:', error); throw error }
+  if (error) throw error
   return data || []
 }
 
@@ -89,6 +81,6 @@ export async function createPlayDate(date) {
     location: date.location, date_time: date.dateTime,
     max_participants: date.maxParticipants, created_by: date.createdBy,
   }]).select().single()
-  if (error) { console.error('createPlayDate error:', error); throw error }
+  if (error) throw error
   return data
 }

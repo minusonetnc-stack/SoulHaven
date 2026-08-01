@@ -26,22 +26,17 @@ export default function LandingPage() {
     }
   }, [knockCount])
 
-  const handleGate = async () => {
-    try {
-      const res = await fetch(`${(import.meta as any).env?.VITE_API_URL || ''}/api/cleanroom/verify`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ passphrase: passphrase.trim() })
-      })
-      if (res.ok) {
-        setShowGate(false); setPassphrase(''); setGateError(''); setIsCleanMode(false)
-        navigate(selectedRoom === 'cleanroom' ? '/cleanroom' : '/inner-sanctum')
-      } else {
-        const data = await res.json().catch(() => ({}))
-        setGateError(data.error || '> ACCESS DENIED')
-      }
-    } catch {
-      setGateError('> CONNECTION FAILED')
+  const handleGate = () => {
+    const p = passphrase.trim()
+    if (!p) return
+    if (selectedRoom === 'cleanroom' && p === 'soulhaven-clean') {
+      setShowGate(false); setPassphrase(''); setGateError(''); setIsCleanMode(false)
+      navigate('/cleanroom')
+    } else if (selectedRoom === 'inner-sanctum' && p === 'soulhaven-sanctum') {
+      setShowGate(false); setPassphrase(''); setGateError(''); setIsCleanMode(false)
+      navigate('/inner-sanctum')
+    } else {
+      setGateError('> ACCESS DENIED')
     }
   }
 
