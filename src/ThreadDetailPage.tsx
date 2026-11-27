@@ -48,7 +48,7 @@ export default function ThreadDetailPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           author: 'Anonymous',
-          authorColor: '#7fb069',
+          authorColor: '#8ba888',
           content: reply,
         })
       })
@@ -63,8 +63,8 @@ export default function ThreadDetailPage() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', background: '#0a0f0a', color: '#e8ede6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ color: '#6b7a66' }}>Loading thread...</p>
+      <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--text)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ color: 'var(--faint)' }}>Loading thread...</p>
       </div>
     )
   }
@@ -77,32 +77,32 @@ export default function ThreadDetailPage() {
   const replies = thread.replies || []
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0a0f0a', color: '#e8ede6', paddingBottom: '80px' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--text)', paddingBottom: '80px' }}>
       <div style={{ maxWidth: '700px', margin: '0 auto', padding: '1.5rem' }}>
-        <button onClick={() => navigate('/threads')} style={{ marginBottom: '1rem', padding: '0.5rem', background: 'none', border: 'none', color: '#a8b5a3', cursor: 'pointer' }}>← Back</button>
+        <button onClick={() => navigate('/threads')} style={{ marginBottom: '1rem', padding: '0.5rem', background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer' }}>← Back</button>
 
-        <div style={{ background: '#1a2e18', border: '1px solid #2d4a2a', borderRadius: '16px', padding: '1.25rem', marginBottom: '1.5rem' }}>
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '8px', padding: '1.25rem', marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', marginBottom: '1rem' }}>
             <div style={{ width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 600, flexShrink: 0, background: thread.authorColor + '20', color: thread.authorColor }}>
               {thread.author[0]}
             </div>
             <div>
-              <h1 style={{ fontSize: '1.25rem', fontWeight: 600, fontFamily: 'Georgia, serif', marginBottom: '0.25rem' }}>{thread.title}</h1>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.625rem', color: '#6b7a66' }}>
+              <h1 style={{ fontSize: '1.25rem', fontWeight: 600, fontFamily: 'var(--serif)', marginBottom: '0.25rem' }}>{thread.title}</h1>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.625rem', color: 'var(--faint)' }}>
                 <span style={{ color: thread.authorColor }}>{thread.author}</span>
                 <span>•</span>
                 <span>{timeAgo(thread.createdAt || thread.createdAt)}</span>
               </div>
             </div>
           </div>
-          <p style={{ color: '#a8b5a3', lineHeight: 1.6 }}>{thread.content}</p>
+          <p style={{ color: 'var(--muted)', lineHeight: 1.6 }}>{thread.content}</p>
         </div>
 
-        <h2 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', color: '#a8b5a3' }}>💬 {replies.length} Replies</h2>
+        <h2 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', color: 'var(--muted)' }}>{replies.length} Replies</h2>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
           {replies.map((r: any) => (
-            <div key={r.id} style={{ background: '#1a2e18', border: '1px solid #2d4a2a', borderRadius: '16px', padding: '1rem' }}>
+            <div key={r.id} style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '8px', padding: '1rem' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
                 <div style={{ width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.625rem', fontWeight: 600, flexShrink: 0, background: r.authorColor + '20', color: r.authorColor }}>
                   {r.author[0]}
@@ -110,9 +110,9 @@ export default function ThreadDetailPage() {
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                     <span style={{ fontSize: '0.75rem', fontWeight: 600, color: r.authorColor }}>{r.author}</span>
-                    <span style={{ fontSize: '0.625rem', color: '#6b7a66' }}>{timeAgo(r.createdAt || r.created_at)}</span>
+                    <span style={{ fontSize: '0.625rem', color: 'var(--faint)' }}>{timeAgo(r.createdAt || r.created_at)}</span>
                   </div>
-                  <p style={{ fontSize: '0.875rem', color: '#a8b5a3' }}>{r.content}</p>
+                  <p style={{ fontSize: '0.875rem', color: 'var(--muted)' }}>{r.content}</p>
                 </div>
               </div>
             </div>
@@ -124,10 +124,10 @@ export default function ThreadDetailPage() {
             value={reply}
             onChange={e => setReply(e.target.value)}
             placeholder="Add your voice..."
-            style={{ flex: 1, padding: '0.625rem', background: '#1a2e18', border: '1px solid #2d4a2a', borderRadius: '12px', color: '#e8ede6', outline: 'none' }}
+            style={{ flex: 1, padding: '0.625rem', background: 'var(--surface-2)', border: '1px solid var(--line)', borderRadius: '8px', color: 'var(--text)', outline: 'none' }}
             onKeyDown={e => e.key === 'Enter' && postReply()}
           />
-          <button onClick={postReply} disabled={!reply.trim()} style={{ padding: '0.625rem 1rem', background: '#5a8a52', color: 'white', borderRadius: '12px', border: 'none', cursor: 'pointer', opacity: reply.trim() ? 1 : 0.4 }}>
+          <button onClick={postReply} disabled={!reply.trim()} style={{ padding: '0.625rem 1rem', background: 'var(--accent-deep)', color: 'var(--accent-ink)', borderRadius: '8px', border: 'none', cursor: 'pointer', opacity: reply.trim() ? 1 : 0.4 }}>
             Send
           </button>
         </div>

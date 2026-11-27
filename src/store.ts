@@ -16,7 +16,7 @@ interface Store {
   clearAllData: () => void
 }
 
-const COLORS = ['#7fb069', '#c4a86b', '#8b7b9e', '#6b9e8e', '#9e7b7b', '#7b9ec4', '#9e8b7b', '#8b9e7b']
+const COLORS = ['#8ba888', '#c2a06b', '#9a8fa8', '#a88383', '#8299b3', '#6f9a8a', '#9a8f7d', '#93a06f']
 const EMOJIS = ['🌿', '🌙', '🔥', '💧', '🍃', '🌻', '🦋', '🐢', '🌲', '🌊']
 
 const genName = () => {

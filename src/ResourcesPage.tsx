@@ -28,21 +28,21 @@ export default function ResourcesPage() {
     : RESOURCES.filter(r => r.categories.includes(activeCategory))
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0a0f0a', color: '#e8ede6', paddingBottom: '80px' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--text)', paddingBottom: '80px' }}>
       <div style={{ maxWidth: '800px', margin: '0 auto', padding: '1.5rem' }}>
-        <button onClick={() => navigate('/sanctuary')} style={{ marginBottom: '1rem', padding: '0.5rem', background: 'none', border: 'none', color: '#a8b5a3', cursor: 'pointer' }}>← Back</button>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 600, color: '#9e7b7b', fontFamily: 'Georgia, serif', marginBottom: '0.5rem' }}>❤️ Crisis & Resources</h1>
+        <button onClick={() => navigate('/sanctuary')} style={{ marginBottom: '1rem', padding: '0.5rem', background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer' }}>← Back</button>
+        <h1 style={{ fontSize: '1.75rem', fontWeight: 600, color: 'var(--text)', fontFamily: 'var(--serif)', marginBottom: '0.5rem' }}>Crisis & Resources</h1>
 
-        <div style={{ background: '#1a2e18', border: '1px solid #3d2a2a', borderRadius: '16px', padding: '1.25rem', marginBottom: '1.5rem' }}>
-          <p style={{ fontSize: '0.875rem', color: '#a8b5a3' }}>
-            If you are in immediate danger, call <strong style={{ color: '#9e7b7b' }}>911</strong> or your local emergency number.
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--danger)', borderRadius: '8px', padding: '1.25rem', marginBottom: '1.5rem' }}>
+          <p style={{ fontSize: '0.875rem', color: 'var(--muted)' }}>
+            If you are in immediate danger, call <strong style={{ color: 'var(--danger)' }}>911</strong> or your local emergency number.
             The resources below are always here, always free, always confidential.
           </p>
         </div>
 
         <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', marginBottom: '1.5rem', paddingBottom: '0.5rem' }}>
           {CATEGORIES.map(cat => (
-            <button key={cat} onClick={() => setActiveCategory(cat)} style={{ padding: '0.375rem 0.875rem', borderRadius: '999px', fontSize: '0.75rem', whiteSpace: 'nowrap', border: 'none', cursor: 'pointer', background: activeCategory === cat ? '#9e7b7b' : '#1a2e18', color: activeCategory === cat ? 'white' : '#a8b5a3' }}>
+            <button key={cat} onClick={() => setActiveCategory(cat)} style={{ padding: '0.375rem 0.875rem', borderRadius: '6px', fontSize: '0.75rem', whiteSpace: 'nowrap', border: 'none', cursor: 'pointer', background: activeCategory === cat ? 'var(--accent-deep)' : 'var(--surface)', color: activeCategory === cat ? 'var(--accent-ink)' : 'var(--muted)' }}>
               {cat}
             </button>
           ))}
@@ -50,21 +50,21 @@ export default function ResourcesPage() {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.75rem' }}>
           {filtered.map(resource => (
-            <div key={resource.id} style={{ background: '#1a2e18', border: '1px solid #2d4a2a', borderRadius: '16px', padding: '1.25rem' }}>
+            <div key={resource.id} style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '8px', padding: '1.25rem' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                 <h3 style={{ fontSize: '0.875rem', fontWeight: 600 }}>{resource.name}</h3>
-                <span style={{ fontSize: '0.625rem', padding: '0.125rem 0.5rem', background: '#0a0f0a', borderRadius: '999px', color: '#6b7a66' }}>{resource.available}</span>
+                <span style={{ fontSize: '0.625rem', padding: '0.125rem 0.5rem', background: 'var(--surface-2)', borderRadius: '6px', color: 'var(--faint)' }}>{resource.available}</span>
               </div>
-              <p style={{ fontSize: '0.75rem', color: '#a8b5a3', marginBottom: '0.75rem' }}>{resource.description}</p>
+              <p style={{ fontSize: '0.75rem', color: 'var(--muted)', marginBottom: '0.75rem' }}>{resource.description}</p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                 {resource.phone && (
-                  <a href={`tel:${resource.phone}`} style={{ fontSize: '0.75rem', color: '#9e7b7b', textDecoration: 'underline' }}>📞 {resource.phone}</a>
+                  <a href={`tel:${resource.phone}`} style={{ fontSize: '0.75rem', color: 'var(--danger)', textDecoration: 'underline' }}>{resource.phone}</a>
                 )}
                 {resource.text && (
-                  <span style={{ fontSize: '0.75rem', color: '#6b7a66' }}>💬 Text: {resource.text}</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--faint)' }}>Text: {resource.text}</span>
                 )}
                 {resource.url && (
-                  <a href={resource.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.75rem', color: '#7fb069', textDecoration: 'underline' }}>🌐 Website →</a>
+                  <a href={resource.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.75rem', color: 'var(--accent)', textDecoration: 'underline' }}>Website →</a>
                 )}
               </div>
             </div>

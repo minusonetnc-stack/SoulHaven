@@ -7,7 +7,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 const CATEGORIES = ['All', 'Recovery', 'Parenting', 'Grief', 'Veteran', 'Night Watch', 'Social', 'General']
 
-const timeAgo = (ts: number | string) => {
+const timeAgo = (ts: number | string | undefined) => {
   if (!ts) return 'just now'
   const date = typeof ts === 'string' ? new Date(ts) : new Date(ts)
   if (isNaN(date.getTime())) return 'just now'
@@ -69,7 +69,7 @@ export default function ThreadsPage() {
           title: newTitle,
           content: newContent,
           author: identity?.soulName || 'Anonymous',
-          authorColor: identity?.soulColor || '#7fb069',
+          authorColor: identity?.soulColor || '#8ba888',
           category: activeCategory === 'All' ? 'General' : activeCategory,
         })
       })
@@ -93,77 +93,77 @@ export default function ThreadsPage() {
   const allThreads = [...pinned, ...regular]
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0a0f0a', color: '#e8ede6', paddingBottom: '80px' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--text)', paddingBottom: '80px' }}>
       <div style={{ maxWidth: '800px', margin: '0 auto', padding: '1.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-          <button onClick={() => navigate('/sanctuary')} style={{ padding: '0.5rem', background: 'none', border: 'none', color: '#a8b5a3', cursor: 'pointer' }}>← Back</button>
-          <button onClick={() => setShowNew(true)} style={{ padding: '0.5rem 1rem', background: '#5a8a52', color: 'white', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '0.875rem' }}>+ New Thread</button>
+          <button onClick={() => navigate('/sanctuary')} style={{ padding: '0.5rem', background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer' }}>← Back</button>
+          <button onClick={() => setShowNew(true)} style={{ padding: '0.5rem 1rem', background: 'var(--accent-deep)', color: 'var(--accent-ink)', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '0.875rem' }}>+ New Thread</button>
         </div>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 600, color: '#c4a86b', fontFamily: 'Georgia, serif', marginBottom: '0.5rem' }}>📖 Threads & Boards</h1>
+        <h1 style={{ fontSize: '1.75rem', fontWeight: 600, color: 'var(--text)', fontFamily: 'var(--serif)', marginBottom: '0.5rem' }}>Threads & Boards</h1>
 
         <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', marginBottom: '1.5rem', paddingBottom: '0.5rem' }}>
           {CATEGORIES.map(cat => (
-            <button key={cat} onClick={() => setActiveCategory(cat)} style={{ padding: '0.375rem 0.875rem', borderRadius: '999px', fontSize: '0.75rem', whiteSpace: 'nowrap', border: 'none', cursor: 'pointer', background: activeCategory === cat ? '#5a8a52' : '#1a2e18', color: activeCategory === cat ? 'white' : '#a8b5a3' }}>
+            <button key={cat} onClick={() => setActiveCategory(cat)} style={{ padding: '0.375rem 0.875rem', borderRadius: '6px', fontSize: '0.75rem', whiteSpace: 'nowrap', border: 'none', cursor: 'pointer', background: activeCategory === cat ? 'var(--accent-deep)' : 'var(--surface)', color: activeCategory === cat ? 'var(--accent-ink)' : 'var(--muted)' }}>
               {cat}
             </button>
           ))}
         </div>
 
         {error && (
-          <div style={{ background: 'rgba(158,123,123,0.15)', border: '1px solid #3d2a2a', borderRadius: '12px', padding: '1rem', marginBottom: '1rem', color: '#c4a86b', fontSize: '0.875rem' }}>
-            ⚠️ {error}
-            <button onClick={fetchThreads} style={{ marginLeft: '0.5rem', color: '#7fb069', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>Retry</button>
+          <div style={{ background: 'var(--danger-soft)', border: '1px solid var(--danger)', borderRadius: '8px', padding: '1rem', marginBottom: '1rem', color: 'var(--danger)', fontSize: '0.875rem' }}>
+            {error}
+            <button onClick={fetchThreads} style={{ marginLeft: '0.5rem', color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>Retry</button>
           </div>
         )}
 
         {showNew && (
-          <div style={{ background: '#1a2e18', border: '1px solid #2d4a2a', borderRadius: '16px', padding: '1.25rem', marginBottom: '1rem' }}>
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '8px', padding: '1.25rem', marginBottom: '1rem' }}>
             <h3 style={{ marginBottom: '0.75rem' }}>Start a New Thread</h3>
             <input
               value={newTitle}
               onChange={e => setNewTitle(e.target.value)}
               placeholder="What is on your mind?"
-              style={{ width: '100%', padding: '0.625rem', background: '#0a0f0a', border: '1px solid #2d4a2a', borderRadius: '8px', color: '#e8ede6', marginBottom: '0.5rem' }}
+              style={{ width: '100%', padding: '0.625rem', background: 'var(--surface-2)', border: '1px solid var(--line)', borderRadius: '6px', color: 'var(--text)', marginBottom: '0.5rem' }}
             />
             <textarea
               value={newContent}
               onChange={e => setNewContent(e.target.value)}
               placeholder="Share your story..." rows={3}
-              style={{ width: '100%', padding: '0.625rem', background: '#0a0f0a', border: '1px solid #2d4a2a', borderRadius: '8px', color: '#e8ede6', marginBottom: '0.5rem', resize: 'none' }}
+              style={{ width: '100%', padding: '0.625rem', background: 'var(--surface-2)', border: '1px solid var(--line)', borderRadius: '6px', color: 'var(--text)', marginBottom: '0.5rem', resize: 'none' }}
             />
             <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-              <button onClick={() => setShowNew(false)} style={{ padding: '0.5rem 1rem', background: '#1a2e18', color: '#a8b5a3', borderRadius: '8px', border: '1px solid #2d4a2a', cursor: 'pointer' }}>Cancel</button>
-              <button onClick={postThread} style={{ padding: '0.5rem 1rem', background: '#5a8a52', color: 'white', borderRadius: '8px', border: 'none', cursor: 'pointer' }}>Post</button>
+              <button onClick={() => setShowNew(false)} style={{ padding: '0.5rem 1rem', background: 'var(--surface)', color: 'var(--muted)', borderRadius: '6px', border: '1px solid var(--line)', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={postThread} style={{ padding: '0.5rem 1rem', background: 'var(--accent-deep)', color: 'var(--accent-ink)', borderRadius: '6px', border: 'none', cursor: 'pointer' }}>Post</button>
             </div>
           </div>
         )}
 
-        {loading && <p style={{ color: '#6b7a66', textAlign: 'center', padding: '2rem' }}>Loading threads...</p>}
+        {loading && <p style={{ color: 'var(--faint)', textAlign: 'center', padding: '2rem' }}>Loading threads...</p>}
 
         {!loading && allThreads.length === 0 && !error && (
-          <div style={{ textAlign: 'center', padding: '3rem', color: '#6b7a66' }}>
+          <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--faint)' }}>
             <p style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>No threads yet</p>
-            <p style={{ fontSize: '0.875rem' }}>Be the first to start a conversation 🌱</p>
+            <p style={{ fontSize: '0.875rem' }}>Be the first to start a conversation.</p>
           </div>
         )}
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {allThreads.map(thread => (
-            <button key={thread.id} onClick={() => navigate(`/thread/${thread.id}`)} style={{ background: '#1a2e18', border: '1px solid #2d4a2a', borderRadius: '16px', padding: '1.25rem', textAlign: 'left', cursor: 'pointer' }}>
+            <button key={thread.id} onClick={() => navigate(`/thread/${thread.id}`)} style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: '8px', padding: '1.25rem', textAlign: 'left', cursor: 'pointer' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.625rem', fontWeight: 600, flexShrink: 0, background: (thread.authorColor || '#7fb069') + '20', color: thread.authorColor || '#7fb069' }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.625rem', fontWeight: 600, flexShrink: 0, background: (thread.authorColor || '#8ba888') + '20', color: thread.authorColor || '#8ba888' }}>
                   {(thread.author || 'A')[0]}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                    {thread.isPinned && <span style={{ fontSize: '0.625rem' }}>📌</span>}
+                    {thread.isPinned && <span style={{ fontSize: '0.625rem', color: 'var(--accent)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Pinned</span>}
                     <h3 style={{ fontSize: '0.875rem', fontWeight: 600 }}>{thread.title || 'Untitled'}</h3>
                   </div>
-                  <p style={{ fontSize: '0.75rem', color: '#a8b5a3', marginBottom: '0.5rem', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{thread.content || ''}</p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.625rem', color: '#6b7a66' }}>
-                    <span style={{ color: thread.authorColor || '#7fb069' }}>{thread.author || 'Anonymous'}</span>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--muted)', marginBottom: '0.5rem', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{thread.content || ''}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.625rem', color: 'var(--faint)' }}>
+                    <span style={{ color: thread.authorColor || '#8ba888' }}>{thread.author || 'Anonymous'}</span>
                     <span>{timeAgo(thread.createdAt || thread.created_at)}</span>
-                    <span>💬 {(thread.replyCount || thread.reply_count || thread.replies?.length || 0)} replies</span>
+                    <span>{(thread.replyCount || thread.reply_count || thread.replies?.length || 0)} replies</span>
                   </div>
                 </div>
               </div>

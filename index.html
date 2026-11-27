@@ -1,23 +1,79 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SoulHaven</title>
+  <script>
+    // Restore the saved theme before first paint (zustand persist key).
+    try {
+      var s = JSON.parse(localStorage.getItem('soulhaven') || 'null')
+      if (s && s.state && (s.state.theme === 'light' || s.state.theme === 'dark')) {
+        document.documentElement.setAttribute('data-theme', s.state.theme)
+      }
+    } catch (e) {}
+  </script>
   <style>
+    :root, [data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #0e120e;
+      --surface: #151b15;
+      --surface-2: #1a211a;
+      --line: #2a332a;
+      --text: #e9ede5;
+      --muted: #9aa294;
+      --faint: #646c62;
+      --accent: #8ba888;
+      --accent-deep: #74906f;
+      --accent-ink: #0e120e;
+      --accent-soft: rgba(139,168,136,.14);
+      --danger: #a88383;
+      --danger-soft: rgba(168,131,131,.14);
+      --gold: #c2a06b;
+      --gold-soft: #d8c49a;
+      --gold-faint: #8a7a5c;
+      --gold-wash: rgba(194,160,107,.12);
+      --terminal-text: #b3c4ae;
+      --terminal-faint: #5c6e58;
+      --serif: Georgia, 'Iowan Old Style', 'Times New Roman', serif;
+      --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #f6f5f1;
+      --surface: #fffefd;
+      --surface-2: #f0eee8;
+      --line: #e0ddd2;
+      --text: #22271f;
+      --muted: #6d7268;
+      --faint: #a3a89b;
+      --accent: #5f7d5b;
+      --accent-deep: #4e6a4b;
+      --accent-ink: #ffffff;
+      --accent-soft: rgba(95,125,91,.12);
+      --danger: #96605f;
+      --danger-soft: rgba(150,96,95,.12);
+      --gold: #a5844e;
+      --gold-soft: #8a6f3e;
+      --gold-faint: #a89a7e;
+      --gold-wash: rgba(165,132,78,.12);
+      --terminal-text: #4a5a45;
+      --terminal-faint: #8a9484;
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      background: #0a0f0a;
-      color: #e8ede6;
-      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
       line-height: 1.6;
+      transition: background .25s ease, color .25s ease;
     }
     a { color: inherit; text-decoration: none; }
     button { cursor: pointer; border: none; background: none; font-family: inherit; }
     input, textarea { font-family: inherit; }
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(127, 176, 105, 0.2); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
   </style>
 </head>
 <body>

@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import { HashRouter, Routes, Route } from 'react-router-dom'
 import { SecureModeProvider, useSecureMode } from './SecureModeContext'
+import { useStore } from './store'
 import PixelWipe from './PixelWipe'
 import LandingPage from './LandingPage'
 import OnboardingPage from './OnboardingPage'
@@ -16,6 +18,12 @@ import InnerSanctumPage from './InnerSanctumPage'
 
 function AppContent() {
   const { isSecure, toggleSecure, isTransitioning } = useSecureMode()
+  const theme = useStore(s => s.theme)
+
+  // Apply the saved theme (dark / light) to the document root.
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+  }, [theme])
 
   return (
     <>
@@ -30,11 +38,12 @@ function AppContent() {
             right: '1rem',
             zIndex: 9999,
             background: 'transparent',
-            border: '1px solid #4ade80',
-            color: '#4ade80',
+            border: '1px solid var(--accent)',
+            color: 'var(--accent)',
             padding: '0.5rem 1rem',
-            fontFamily: '"Courier New", monospace',
+            fontFamily: 'var(--sans)',
             fontSize: '0.75rem',
+            borderRadius: '6px',
             cursor: 'pointer',
             opacity: 0.6,
             transition: 'opacity 0.3s',

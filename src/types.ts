@@ -29,8 +29,10 @@ export interface Thread {
   category: string
   replies: { id: string; author: string; authorColor: string; content: string; createdAt: number }[]
   createdAt: number
+  created_at?: number | string
   isPinned: boolean
   replyCount?: number
+  reply_count?: number
 }
 
 export interface PlayDate {
