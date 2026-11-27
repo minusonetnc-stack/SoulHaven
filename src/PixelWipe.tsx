@@ -73,8 +73,8 @@ export default function PixelWipe({ isActive, onComplete, onReverseComplete }: P
       ctx.fillStyle = 'rgba(0, 0, 0, 0.08)'
       ctx.fillRect(0, 0, w, h)
 
-      ctx.fillStyle = '#0f0'
-      ctx.font = 'bold 14px monospace'
+      ctx.fillStyle = '#8ba888'
+      ctx.font = 'bold 14px sans-serif'
 
       for (let i = 0; i < drops.length; i++) {
         const char = Math.random() > 0.7 ? BLOCK : (Math.random() > 0.5 ? THIN_BLOCK : FADE_BLOCK)
@@ -155,7 +155,7 @@ export default function PixelWipe({ isActive, onComplete, onReverseComplete }: P
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        background: '#000',
+        background: 'var(--bg)',
         opacity: cutProgressRef.current > 0.3 ? 1 : 0,
         transition: 'opacity 1s ease',
         zIndex: 0,
@@ -174,13 +174,13 @@ export default function PixelWipe({ isActive, onComplete, onReverseComplete }: P
               viewBox="0 0 140 160" 
               style={{ margin: '0 auto 1.5rem', display: 'block' }}
             >
-              <g fill="none" stroke="#4ade80" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" opacity="0.9">
+              <g fill="none" stroke="var(--accent)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" opacity="0.9">
                 <path d="M70 15 C70 15, 25 40, 25 85 C25 125, 45 145, 70 150 C95 145, 115 125, 115 85 C115 40, 70 15, 70 15Z" />
                 <path d="M70 25 C70 25, 35 45, 35 85 C35 120, 50 138, 70 142 C90 138, 105 120, 105 85 C105 45, 70 25, 70 25Z" opacity="0.7" />
                 <path d="M70 35 C70 35, 45 50, 45 85 C45 115, 55 130, 70 134 C85 130, 95 115, 95 85 C95 50, 70 35, 70 35Z" opacity="0.5" />
               </g>
 
-              <g fill="none" stroke="#4ade80" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+              <g fill="none" stroke="var(--accent)" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M70 134 L70 90" />
                 <path d="M70 110 Q55 100, 50 85 Q48 75, 55 70 Q62 68, 68 80 L70 85" />
                 <path d="M55 70 Q52 78, 58 82" opacity="0.6" />
@@ -193,27 +193,27 @@ export default function PixelWipe({ isActive, onComplete, onReverseComplete }: P
                 <path d="M70 55 L70 65" opacity="0.4" strokeWidth="0.6" />
               </g>
 
-              <circle cx="30" cy="80" r="1" fill="#4ade80" opacity="0.3" />
-              <circle cx="110" cy="80" r="1" fill="#4ade80" opacity="0.3" />
-              <circle cx="70" cy="155" r="1.5" fill="#4ade80" opacity="0.4" />
+              <circle cx="30" cy="80" r="1" fill="var(--accent)" opacity="0.3" />
+              <circle cx="110" cy="80" r="1" fill="var(--accent)" opacity="0.3" />
+              <circle cx="70" cy="155" r="1.5" fill="var(--accent)" opacity="0.4" />
             </svg>
 
             <h1 style={{
-              fontFamily: '"Courier New", monospace',
+              fontFamily: 'var(--sans)',
               fontSize: 'clamp(1.2rem, 4vw, 1.8rem)',
-              color: '#4ade80',
+              color: 'var(--accent)',
               letterSpacing: '0.25em',
               textTransform: 'uppercase',
               marginBottom: '0.5rem',
               fontWeight: 300,
-              textShadow: '0 0 20px rgba(74, 222, 128, 0.3)',
+              
             }}>
               SoulHaven
             </h1>
             <p style={{
-              fontFamily: '"Courier New", monospace',
+              fontFamily: 'var(--sans)',
               fontSize: 'clamp(0.625rem, 2vw, 0.875rem)',
-              color: '#4ade80',
+              color: 'var(--accent)',
               opacity: 0.6,
               letterSpacing: '0.3em',
               fontWeight: 300,
@@ -237,25 +237,25 @@ export default function PixelWipe({ isActive, onComplete, onReverseComplete }: P
           }}>
             <div style={{
               padding: '1rem 1.5rem',
-              border: '1px solid #4ade80',
+              border: '1px solid var(--accent)',
               borderRadius: '2px',
-              background: 'rgba(0, 255, 0, 0.03)',
+              background: 'var(--accent-soft)',
             }}>
               <p style={{
-                fontFamily: '"Courier New", monospace',
+                fontFamily: 'var(--sans)',
                 fontSize: 'clamp(0.875rem, 2.5vw, 1.125rem)',
-                color: '#4ade80',
+                color: 'var(--accent)',
                 margin: 0,
                 fontWeight: 300,
                 letterSpacing: '0.1em',
-                textShadow: '0 0 10px #0f060',
+                
               }}>
                 ✓ You're safe
               </p>
               <p style={{
-                fontFamily: '"Courier New", monospace',
+                fontFamily: 'var(--sans)',
                 fontSize: 'clamp(0.5rem, 1.5vw, 0.625rem)',
-                color: '#4ade80',
+                color: 'var(--accent)',
                 opacity: 0.5,
                 marginTop: '0.5rem',
                 letterSpacing: '0.15em',
